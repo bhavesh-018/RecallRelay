@@ -14,7 +14,7 @@
 - [x] **Phase 3 (`feature/domain-foundation`):** PostgreSQL schema + Alembic, 5-location + `B17`/`B18` seed, shipment trace API, accounting checks, operator auth.
 - [x] **Phase 4 (`feature/recall-lifecycle`):** Idempotent publish, batch-filtered task generation, scoped tokens, `/join` auto-session entry, response revisions, audit history.
 - [x] **Phase 5 (`feature/vertical-ui`):** Operator overview (`<=5s` polling), batch trace view, publish screen, reusable `RecallFlow` (`standard` mode) + receipt, Playwright E2E.
-- [ ] **Phase 6 (`feature/access-integration`):** Host-aware QR URLs, practice-only reset endpoint, `cloudflared` HTTPS mobile test, Day 1 Gate.
+- [x] **Phase 6 (`feature/access-integration`):** Host-aware QR URLs, practice-only reset endpoint, `cloudflared` HTTPS mobile test, Day 1 Gate.
 
 ## Day 2 · November 27 — Experiment & Bounded Agent
 - [ ] **Phase 7 (`feature/phase-7-guided-workflow`):** `RecallFlow` `guided` step-by-step mode + Playwright mobile checks.

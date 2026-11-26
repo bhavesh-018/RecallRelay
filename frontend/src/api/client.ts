@@ -165,6 +165,24 @@ export interface JoinStudyResponse {
   banner: string;
 }
 
+export interface TaskQrPayload {
+  task_id: string;
+  location_id: string;
+  location_name: string;
+  target_url: string;
+  is_localhost_warning: boolean;
+  banner: string;
+  qr_data_url: string;
+}
+
+export interface PracticeResetResponse {
+  status: string;
+  dataset_key: string;
+  practice_sessions_deleted: number;
+  study_sessions_preserved: number;
+  recalls_deleted: number;
+}
+
 export class ApiError extends Error {
   status: number;
   code: string;
@@ -311,4 +329,14 @@ export async function joinStudy(existingToken?: string | null, isPractice = fals
     },
     null,
   );
+}
+
+export async function getTaskQr(taskId: string, baseUrl?: string): Promise<TaskQrPayload> {
+  const params = new URLSearchParams({ format: 'json' });
+  if (baseUrl) params.set('base_url', baseUrl);
+  return apiFetch<TaskQrPayload>(`/api/tasks/${encodeURIComponent(taskId)}/qr?${params.toString()}`);
+}
+
+export async function resetPracticeFixture(): Promise<PracticeResetResponse> {
+  return apiFetch<PracticeResetResponse>('/api/practice/reset', { method: 'POST' });
 }

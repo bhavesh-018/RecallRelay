@@ -5,8 +5,10 @@ import {
   type AuditEventItem,
   type RecallListItem,
   type RecallOverview,
+  type TaskQrPayload,
   getRecall,
   getTaskAudit,
+  getTaskQr,
   listRecalls,
 } from '../../api/client';
 
@@ -47,6 +49,9 @@ export function OperatorOverview({
   const [auditTaskId, setAuditTaskId] = useState<string | null>(null);
   const [auditEvents, setAuditEvents] = useState<AuditEventItem[]>([]);
   const [auditError, setAuditError] = useState<string | null>(null);
+
+  const [qrPayload, setQrPayload] = useState<TaskQrPayload | null>(null);
+  const [qrError, setQrError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -112,6 +117,22 @@ export function OperatorOverview({
     }
     setCopiedTaskId(taskId);
     window.setTimeout(() => setCopiedTaskId(null), 1800);
+  }
+
+  async function handleShowQr(taskId: string) {
+    setQrError(null);
+    if (!operatorAuthenticated) {
+      setQrPayload(null);
+      setQrError('Sign in as Operator to generate printable QR codes.');
+      return;
+    }
+    try {
+      const payload = await getTaskQr(taskId, window.location.origin);
+      setQrPayload(payload);
+    } catch (err) {
+      setQrPayload(null);
+      setQrError(err instanceof ApiError ? err.message : 'Unable to generate QR code.');
+    }
   }
 
   if (loading && !overview) {
@@ -273,6 +294,13 @@ export function OperatorOverview({
                     </button>
                     <button
                       type="button"
+                      onClick={() => void handleShowQr(task.task_id)}
+                      className="rounded border border-[#27272A] bg-[#09090B] px-2 py-1 text-xs text-[#A1A1AA] transition-colors hover:text-[#EDEDED]"
+                    >
+                      QR
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => void handleInspectAudit(task.task_id)}
                       className="rounded border border-[#27272A] bg-[#09090B] px-2 py-1 text-xs text-[#A1A1AA] transition-colors hover:text-[#EDEDED]"
                     >
@@ -285,6 +313,49 @@ export function OperatorOverview({
           </tbody>
         </table>
       </div>
+
+      {/* QR Label Preview Panel */}
+      {(qrPayload || qrError) && (
+        <div className="rr-panel-enter rounded-lg border border-[#27272A] bg-[#18181B] p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-[#EDEDED]">
+              Printable Box QR Label {qrPayload ? `· ${qrPayload.location_name}` : ''}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setQrPayload(null);
+                setQrError(null);
+              }}
+              className="text-xs text-[#A1A1AA] hover:text-[#EDEDED]"
+            >
+              Close
+            </button>
+          </div>
+          {qrError ? (
+            <div className="text-xs text-amber-300">{qrError}</div>
+          ) : (
+            qrPayload && (
+              <div className="flex flex-wrap items-center gap-4">
+                <img
+                  src={qrPayload.qr_data_url}
+                  alt={`QR code for ${qrPayload.location_name}`}
+                  className="h-32 w-32 rounded border border-[#27272A] bg-white p-1"
+                />
+                <div className="space-y-1.5 text-xs">
+                  <div className="font-medium text-[#EDEDED]">{qrPayload.banner}</div>
+                  <div className="break-all font-mono text-[#A1A1AA]">{qrPayload.target_url}</div>
+                  {qrPayload.is_localhost_warning && (
+                    <div className="rounded border border-amber-800/60 bg-amber-950/30 px-2.5 py-1.5 text-amber-300">
+                      Localhost URL detected: open the console via your cloudflared HTTPS URL before scanning from a phone.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          )}
+        </div>
+      )}
 
       {/* Audit Drawer */}
       {auditTaskId && (
