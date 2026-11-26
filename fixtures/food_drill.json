@@ -1,0 +1,119 @@
+{
+  "dataset_key": "food_drill",
+  "locations": [
+    {
+      "id": "mfg_central",
+      "name": "Manufacturer Central Warehouse",
+      "role": "manufacturer",
+      "parent_id": null
+    },
+    {
+      "id": "dist_north",
+      "name": "Distributor Hub North",
+      "role": "distributor",
+      "parent_id": "mfg_central"
+    },
+    {
+      "id": "shop_a",
+      "name": "Shop A (Downtown)",
+      "role": "shop",
+      "parent_id": "dist_north"
+    },
+    {
+      "id": "shop_b",
+      "name": "Shop B (Uptown)",
+      "role": "shop",
+      "parent_id": "dist_north"
+    },
+    {
+      "id": "shop_c",
+      "name": "Shop C (Suburbs)",
+      "role": "shop",
+      "parent_id": "dist_north"
+    }
+  ],
+  "batches": [
+    {
+      "id": "batch_b17",
+      "product_name": "SunGrain Crunchy Oats 500g",
+      "batch_code": "B17",
+      "opening_location_id": "mfg_central",
+      "opening_quantity": 100,
+      "is_practice": false
+    },
+    {
+      "id": "batch_b18",
+      "product_name": "SunGrain Crunchy Oats 500g",
+      "batch_code": "B18",
+      "opening_location_id": "mfg_central",
+      "opening_quantity": 80,
+      "is_practice": false
+    }
+  ],
+  "shipments": [
+    {
+      "id": "ship_b17_1",
+      "batch_code": "B17",
+      "sender_id": "mfg_central",
+      "receiver_id": "dist_north",
+      "quantity": 60,
+      "accepted_at": "2026-11-24T09:00:00Z"
+    },
+    {
+      "id": "ship_b17_2",
+      "batch_code": "B17",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_a",
+      "quantity": 15,
+      "accepted_at": "2026-11-24T11:30:00Z"
+    },
+    {
+      "id": "ship_b17_3",
+      "batch_code": "B17",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_b",
+      "quantity": 15,
+      "accepted_at": "2026-11-24T12:00:00Z"
+    },
+    {
+      "id": "ship_b17_4",
+      "batch_code": "B17",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_c",
+      "quantity": 10,
+      "accepted_at": "2026-11-24T12:15:00Z"
+    },
+    {
+      "id": "ship_b18_1",
+      "batch_code": "B18",
+      "sender_id": "mfg_central",
+      "receiver_id": "dist_north",
+      "quantity": 40,
+      "accepted_at": "2026-11-25T09:00:00Z"
+    },
+    {
+      "id": "ship_b18_2",
+      "batch_code": "B18",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_a",
+      "quantity": 10,
+      "accepted_at": "2026-11-25T11:00:00Z"
+    },
+    {
+      "id": "ship_b18_3",
+      "batch_code": "B18",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_b",
+      "quantity": 10,
+      "accepted_at": "2026-11-25T11:30:00Z"
+    },
+    {
+      "id": "ship_b18_4",
+      "batch_code": "B18",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_c",
+      "quantity": 5,
+      "accepted_at": "2026-11-25T12:00:00Z"
+    }
+  ]
+}

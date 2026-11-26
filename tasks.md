@@ -10,11 +10,11 @@
 ## Day 1 · November 26 — Complete Recall Path
 - [x] **Pre-Kickoff:** Git `main` initialized, Flagsmith Docker smoke-tested, Cloud `Study`/`Pilot` keys ready, `cloudflared` installed.
 - [x] **Phase 1 (`feature/phase-1-setup`):** `AGENTS.md`, `tasks.md`, `decision_log.md`, FastAPI `:8080` + pytest baseline, React/TS/Vite/Tailwind dark theme baseline.
-- [ ] **Phase 2 (`feature/phase-2-flagsmith-spike`):** Flagsmith Python SDK (`>=6.3.0`) remote evaluation, practice `standard`/`guided` exposure + `track_event`, LLM + Management API smoke check. *(90-min timebox on self-hosted events before Cloud study fallback.)*
-- [ ] **Phase 3 (`feature/phase-3-domain-foundation`):** PostgreSQL schema + Alembic, 5-location + `B17`/`B18` seed, shipment trace API, accounting checks, operator auth.
-- [ ] **Phase 4 (`feature/phase-4-recall-lifecycle`):** Idempotent publish, batch-filtered task generation, scoped tokens, `/join` auto-session entry, response revisions, audit history.
-- [ ] **Phase 5 (`feature/phase-5-vertical-ui`):** Operator overview (`<=5s` polling), batch trace view, publish screen, reusable `RecallFlow` (`standard` mode) + receipt, Playwright E2E.
-- [ ] **Phase 6 (`feature/phase-6-access-integration`):** Host-aware QR URLs, practice-only reset endpoint, `cloudflared` HTTPS mobile test, Day 1 Gate.
+- [x] **Phase 2 (`feature/flagsmith-spike`):** Flagsmith Python SDK (`>=6.3.0`) remote evaluation, practice `standard`/`guided` exposure + `track_event`, LLM + Management API smoke check. *(90-min timebox on self-hosted events before Cloud study fallback.)*
+- [x] **Phase 3 (`feature/domain-foundation`):** PostgreSQL schema + Alembic, 5-location + `B17`/`B18` seed, shipment trace API, accounting checks, operator auth.
+- [ ] **Phase 4 (`feature/recall-lifecycle`):** Idempotent publish, batch-filtered task generation, scoped tokens, `/join` auto-session entry, response revisions, audit history.
+- [ ] **Phase 5 (`feature/vertical-ui`):** Operator overview (`<=5s` polling), batch trace view, publish screen, reusable `RecallFlow` (`standard` mode) + receipt, Playwright E2E.
+- [ ] **Phase 6 (`feature/access-integration`):** Host-aware QR URLs, practice-only reset endpoint, `cloudflared` HTTPS mobile test, Day 1 Gate.
 
 ## Day 2 · November 27 — Experiment & Bounded Agent
 - [ ] **Phase 7 (`feature/phase-7-guided-workflow`):** `RecallFlow` `guided` step-by-step mode + Playwright mobile checks.
