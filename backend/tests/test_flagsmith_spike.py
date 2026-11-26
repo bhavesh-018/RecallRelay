@@ -238,3 +238,91 @@ def test_empty_identity_raises_value_error() -> None:
         adapter.evaluate_recall_flow("   ")
     with pytest.raises(ValueError):
         adapter.track_outcome_event("recall_drill_success", "")
+
+
+def test_flagsmith_cloud_variant_keys_resolve_via_flag_value() -> None:
+    """Flagsmith Cloud returns variant='control'/'Variant_1' with value='standard'/'guided'."""
+    fake = FakeFlagsmithClient(
+        assignments={
+            "p_ctrl": FakeFlag(
+                enabled=True,
+                value="standard",
+                variant="control",
+                experiment=FakeExperiment(id=718, in_experiment=True),
+            ),
+            "p_var1": FakeFlag(
+                enabled=True,
+                value="guided",
+                variant="Variant_1",
+                experiment=FakeExperiment(id=718, in_experiment=True),
+            ),
+        }
+    )
+    adapter = FlagsmithAdapter(fake)
+    r1 = adapter.evaluate_recall_flow("p_ctrl")
+    r2 = adapter.evaluate_recall_flow("p_var1")
+    assert r1.variant == "standard" and r1.is_default is False and r1.exposure_sent is True
+    assert r2.variant == "guided" and r2.is_default is False and r2.exposure_sent is True
+
+
+def test_management_client_resolves_integer_mv_option_ids_and_token_fallback() -> None:
+    """Flagsmith Cloud Account Token auth and integer MV option IDs resolve cleanly."""
+    put_payloads: list[dict[str, Any]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.headers.get("Authorization") == "Api-Key acct-token":
+            return httpx.Response(401, json={"detail": "Invalid Api-Key"})
+        assert request.headers.get("Authorization") == "Token acct-token"
+        url = str(request.url)
+        if "/environments/env-cloud/featurestates/9002/" in url and request.method == "PUT":
+            import json as _json
+            body = _json.loads(request.content.decode("utf-8"))
+            put_payloads.append(body)
+            return httpx.Response(200, json=body)
+        if "/environments/env-cloud/featurestates/" in url:
+            return httpx.Response(
+                200,
+                json={
+                    "results": [
+                        {
+                            "id": 9002,
+                            "enabled": True,
+                            "feature_state_value": "standard",
+                            "feature": 306168,
+                            "multivariate_feature_state_values": [
+                                {
+                                    "id": 387076,
+                                    "multivariate_feature_option": 37423,
+                                    "percentage_allocation": 50.0,
+                                }
+                            ],
+                        }
+                    ]
+                },
+            )
+        if url.endswith("/environments/env-cloud/"):
+            return httpx.Response(200, json={"id": 119111, "name": "Pilot", "project": 55588})
+        if "/projects/55588/features/306168/" in url:
+            return httpx.Response(
+                200,
+                json={
+                    "id": 306168,
+                    "name": "recall_response_flow",
+                    "multivariate_options": [{"id": 37423, "string_value": "guided"}],
+                },
+            )
+        return httpx.Response(404)
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as http_client:
+        mgmt = FlagsmithManagementClient(
+            management_token="acct-token",
+            admin_api_url="https://api.flagsmith.com/api/v1/",
+            http_client=http_client,
+        )
+        snap = mgmt.read_pilot_flag("env-cloud", "recall_response_flow")
+        assert snap.multivariate_weights == {"guided": 50.0, "standard": 50.0}
+        updated = mgmt.update_pilot_multivariate_weights(
+            "env-cloud", snap, {"guided": 100.0, "standard": 0.0}
+        )
+        assert updated.multivariate_weights == {"guided": 100.0, "standard": 0.0}
+        assert put_payloads[0]["multivariate_feature_state_values"][0]["percentage_allocation"] == 100.0

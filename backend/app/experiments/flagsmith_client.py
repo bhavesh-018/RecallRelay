@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import hashlib
 import json
 from typing import Any, Mapping, Protocol
@@ -66,6 +66,7 @@ class PilotFlagSnapshot:
     multivariate_weights: dict[str, float]
     config_hash: str
     raw: dict[str, Any]
+    option_value_map: dict[int, str] = field(default_factory=dict)
 
 
 def build_flagsmith_client(
@@ -139,7 +140,14 @@ class FlagsmithAdapter:
 
         raw_value = getattr(flag, "value", None)
         variant_key = getattr(flag, "variant", None)
-        candidate = str(variant_key or raw_value or DEFAULT_FLOW_VARIANT)
+        raw_str = str(raw_value) if raw_value is not None else ""
+        variant_str = str(variant_key) if variant_key is not None else ""
+        if raw_str in ALLOWED_FLOW_VARIANTS:
+            candidate = raw_str
+        elif variant_str in ALLOWED_FLOW_VARIANTS:
+            candidate = variant_str
+        else:
+            candidate = raw_str or variant_str or DEFAULT_FLOW_VARIANT
         is_allowed = candidate in ALLOWED_FLOW_VARIANTS
         resolved_variant = candidate if is_allowed else DEFAULT_FLOW_VARIANT
 
@@ -206,6 +214,108 @@ class FlagsmithManagementClient:
         self._base_url = admin_api_url.rstrip("/")
         self._external_client = http_client
 
+    def _auth_header_candidates(self) -> list[dict[str, str]]:
+        if self._token.startswith(("Api-Key ", "Token ")):
+            return [{"Authorization": self._token}]
+        return [
+            {"Authorization": f"Api-Key {self._token}"},
+            {"Authorization": f"Token {self._token}"},
+        ]
+
+    def _request_with_auth(
+        self,
+        client: httpx.Client,
+        method: str,
+        url: str,
+        *,
+        params: dict[str, Any] | None = None,
+        json_body: dict[str, Any] | None = None,
+    ) -> httpx.Response:
+        resp: httpx.Response | None = None
+        for headers in self._auth_header_candidates():
+            resp = client.request(
+                method,
+                url,
+                headers=headers,
+                params=params,
+                json=json_body,
+                timeout=10.0,
+            )
+            if resp.status_code != 401:
+                break
+        assert resp is not None
+        resp.raise_for_status()
+        return resp
+
+    def _resolve_option_value_map(
+        self,
+        client: httpx.Client,
+        environment_id: str,
+        state: dict[str, Any],
+    ) -> dict[int, str]:
+        mv_list = state.get("multivariate_feature_state_values", []) or []
+        needs_lookup = any(
+            isinstance(mv.get("multivariate_feature_option"), int) and mv.get("value") is None
+            for mv in mv_list
+        )
+        if not needs_lookup:
+            return {}
+
+        feature_ref = state.get("feature")
+        feature_id = feature_ref.get("id") if isinstance(feature_ref, dict) else feature_ref
+        if not feature_id:
+            return {}
+
+        env_resp = self._request_with_auth(
+            client,
+            "GET",
+            f"{self._base_url}/environments/{environment_id}/",
+        )
+        project_id = env_resp.json().get("project")
+        if not project_id:
+            return {}
+
+        feat_resp = self._request_with_auth(
+            client,
+            "GET",
+            f"{self._base_url}/projects/{project_id}/features/{feature_id}/",
+        )
+        mapping: dict[int, str] = {}
+        for opt in feat_resp.json().get("multivariate_options", []) or []:
+            opt_id = opt.get("id")
+            val = opt.get("string_value")
+            if val is None:
+                val = opt.get("value")
+            if val is None:
+                val = opt.get("integer_value")
+            if val is None:
+                val = opt.get("boolean_value")
+            if opt_id is not None and val is not None:
+                mapping[int(opt_id)] = str(val)
+        return mapping
+
+    @staticmethod
+    def _extract_weights(
+        state: dict[str, Any],
+        default_value: str | None,
+        option_value_map: Mapping[int, str],
+    ) -> dict[str, float]:
+        weights: dict[str, float] = {}
+        for mv in state.get("multivariate_feature_state_values", []) or []:
+            option = mv.get("multivariate_feature_option")
+            if isinstance(option, dict):
+                opt_val = option.get("value")
+            elif isinstance(option, int) and option in option_value_map:
+                opt_val = option_value_map[option]
+            else:
+                opt_val = mv.get("value")
+            if opt_val is not None:
+                weights[str(opt_val)] = float(mv.get("percentage_allocation", 0.0))
+
+        if weights and default_value is not None and default_value not in weights:
+            weights[default_value] = max(0.0, round(100.0 - sum(weights.values()), 4))
+        return weights
+
     def read_pilot_flag(
         self,
         environment_id: str,
@@ -216,40 +326,37 @@ class FlagsmithManagementClient:
             raise ValueError("Flagsmith pilot environment ID is required.")
 
         url = f"{self._base_url}/environments/{environment_id}/featurestates/"
-        headers = {"Authorization": f"Api-Key {self._token}"}
 
-        def _fetch(client: httpx.Client) -> dict[str, Any]:
-            resp = client.get(url, headers=headers, params={"feature_name": feature_name}, timeout=10.0)
-            resp.raise_for_status()
+        def _fetch(client: httpx.Client) -> tuple[dict[str, Any], dict[int, str]]:
+            resp = self._request_with_auth(client, "GET", url, params={"feature_name": feature_name})
             payload = resp.json()
             results = payload.get("results", payload) if isinstance(payload, dict) else payload
             if not isinstance(results, list):
                 raise ValueError("Unexpected featurestates response payload from Flagsmith API.")
+            chosen: dict[str, Any] | None = None
             for item in results:
                 feature_obj = item.get("feature")
                 name = feature_obj.get("name") if isinstance(feature_obj, dict) else item.get("feature_name")
                 if name == feature_name:
-                    return item
-            if len(results) == 1:
-                return results[0]
-            raise LookupError(f"Feature '{feature_name}' not found in environment '{environment_id}'.")
+                    chosen = item
+                    break
+            if chosen is None and len(results) == 1:
+                chosen = results[0]
+            if chosen is None:
+                raise LookupError(f"Feature '{feature_name}' not found in environment '{environment_id}'.")
+            option_map = self._resolve_option_value_map(client, str(environment_id), chosen)
+            return chosen, option_map
 
         if self._external_client is not None:
-            state = _fetch(self._external_client)
+            state, option_map = _fetch(self._external_client)
         else:
             with httpx.Client() as client:
-                state = _fetch(client)
+                state, option_map = _fetch(client)
 
         enabled = bool(state.get("enabled", False))
         raw_val = state.get("feature_state_value")
         default_value = None if raw_val is None else str(raw_val)
-
-        weights: dict[str, float] = {}
-        for mv in state.get("multivariate_feature_state_values", []) or []:
-            option = mv.get("multivariate_feature_option") or {}
-            opt_val = option.get("value") if isinstance(option, dict) else mv.get("value")
-            if opt_val is not None:
-                weights[str(opt_val)] = float(mv.get("percentage_allocation", 0.0))
+        weights = self._extract_weights(state, default_value, option_map)
 
         config_hash = compute_pilot_config_hash(enabled, default_value, weights)
         return PilotFlagSnapshot(
@@ -261,6 +368,7 @@ class FlagsmithManagementClient:
             multivariate_weights=weights,
             config_hash=config_hash,
             raw=state,
+            option_value_map=option_map,
         )
 
     def update_pilot_multivariate_weights(
@@ -271,27 +379,32 @@ class FlagsmithManagementClient:
     ) -> PilotFlagSnapshot:
         """Apply updated multivariate percentage allocations to an allowlisted pilot feature state."""
         url = f"{self._base_url}/environments/{environment_id}/featurestates/{snapshot.feature_state_id}/"
-        headers = {"Authorization": f"Api-Key {self._token}"}
 
         mv_items = []
         for mv in snapshot.raw.get("multivariate_feature_state_values", []) or []:
-            option = mv.get("multivariate_feature_option") or {}
-            opt_val = option.get("value") if isinstance(option, dict) else mv.get("value")
+            option = mv.get("multivariate_feature_option")
+            if isinstance(option, dict):
+                opt_val = option.get("value")
+            elif isinstance(option, int) and option in snapshot.option_value_map:
+                opt_val = snapshot.option_value_map[option]
+            else:
+                opt_val = mv.get("value")
             updated_mv = dict(mv)
             if opt_val is not None and str(opt_val) in desired_weights:
                 updated_mv["percentage_allocation"] = float(desired_weights[str(opt_val)])
             mv_items.append(updated_mv)
 
-        payload = {
+        payload: dict[str, Any] = {
             "id": snapshot.feature_state_id,
             "enabled": snapshot.enabled,
             "feature_state_value": snapshot.default_value,
             "multivariate_feature_state_values": mv_items,
         }
+        if "feature" in snapshot.raw:
+            payload["feature"] = snapshot.raw["feature"]
 
         def _put(client: httpx.Client) -> dict[str, Any]:
-            resp = client.put(url, headers=headers, json=payload, timeout=10.0)
-            resp.raise_for_status()
+            resp = self._request_with_auth(client, "PUT", url, json_body=payload)
             return resp.json()
 
         if self._external_client is not None:
@@ -300,16 +413,10 @@ class FlagsmithManagementClient:
             with httpx.Client() as client:
                 updated_raw = _put(client)
 
-        new_weights: dict[str, float] = {}
-        for mv in updated_raw.get("multivariate_feature_state_values", []) or []:
-            option = mv.get("multivariate_feature_option") or {}
-            opt_val = option.get("value") if isinstance(option, dict) else mv.get("value")
-            if opt_val is not None:
-                new_weights[str(opt_val)] = float(mv.get("percentage_allocation", 0.0))
-
         new_enabled = bool(updated_raw.get("enabled", snapshot.enabled))
         raw_val = updated_raw.get("feature_state_value")
         new_default = None if raw_val is None else str(raw_val)
+        new_weights = self._extract_weights(updated_raw, new_default, snapshot.option_value_map)
         return PilotFlagSnapshot(
             environment_id=str(environment_id),
             feature_name=snapshot.feature_name,
@@ -319,4 +426,5 @@ class FlagsmithManagementClient:
             multivariate_weights=new_weights or dict(desired_weights),
             config_hash=compute_pilot_config_hash(new_enabled, new_default, new_weights or desired_weights),
             raw=updated_raw,
+            option_value_map=dict(snapshot.option_value_map),
         )
