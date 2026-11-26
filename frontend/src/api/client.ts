@@ -531,3 +531,20 @@ export async function rejectAgentProposal(
     body: JSON.stringify({ revision }),
   });
 }
+
+export async function applyAgentProposal(
+  proposalId: string,
+  revision: number,
+): Promise<{
+  proposal_id: string;
+  status: string;
+  mode?: string;
+  idempotent_reused: boolean;
+  reconciled_after_timeout: boolean;
+  readback_weights?: Record<string, number>;
+}> {
+  return apiFetch(`/api/agent/proposals/${encodeURIComponent(proposalId)}/apply`, {
+    method: 'POST',
+    body: JSON.stringify({ revision }),
+  });
+}

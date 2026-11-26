@@ -22,7 +22,7 @@
 - [ ] **Phase 9 (`feature/practice-freeze`):** 2–4 practice testers, wording fixes, freeze `Study` configuration.
 - [ ] **Phase 10 (Live Ops):** Study Block 1 collection (frozen codebase).
 - [x] **Phase 11 (`feature/agent-workbench`):** Evidence tools, bounded LLM orchestrator, deterministic validator, Agent Workbench UI.
-- [ ] **Phase 12 (`feature/agent-integration`):** Flagsmith Management API apply/readback, stale-hash recovery, self-hosted config recovery, Study Block 2.
+- [x] **Phase 12 (`feature/agent-integration`):** Flagsmith Management API apply/readback, stale-hash recovery, self-hosted config recovery, Study Block 2.
 
 ## Day 3 · November 28 — Verification, Reuse & Freeze
 - [ ] **Phase 13 (`feature/phase-13-reliability-evals`):** 9 adversarial agent eval scenarios, accounting/outbox hardening.

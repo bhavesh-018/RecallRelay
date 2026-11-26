@@ -262,3 +262,61 @@ class FlagsmithManagementClient:
             config_hash=config_hash,
             raw=state,
         )
+
+    def update_pilot_multivariate_weights(
+        self,
+        environment_id: str,
+        snapshot: PilotFlagSnapshot,
+        desired_weights: Mapping[str, float],
+    ) -> PilotFlagSnapshot:
+        """Apply updated multivariate percentage allocations to an allowlisted pilot feature state."""
+        url = f"{self._base_url}/environments/{environment_id}/featurestates/{snapshot.feature_state_id}/"
+        headers = {"Authorization": f"Api-Key {self._token}"}
+
+        mv_items = []
+        for mv in snapshot.raw.get("multivariate_feature_state_values", []) or []:
+            option = mv.get("multivariate_feature_option") or {}
+            opt_val = option.get("value") if isinstance(option, dict) else mv.get("value")
+            updated_mv = dict(mv)
+            if opt_val is not None and str(opt_val) in desired_weights:
+                updated_mv["percentage_allocation"] = float(desired_weights[str(opt_val)])
+            mv_items.append(updated_mv)
+
+        payload = {
+            "id": snapshot.feature_state_id,
+            "enabled": snapshot.enabled,
+            "feature_state_value": snapshot.default_value,
+            "multivariate_feature_state_values": mv_items,
+        }
+
+        def _put(client: httpx.Client) -> dict[str, Any]:
+            resp = client.put(url, headers=headers, json=payload, timeout=10.0)
+            resp.raise_for_status()
+            return resp.json()
+
+        if self._external_client is not None:
+            updated_raw = _put(self._external_client)
+        else:
+            with httpx.Client() as client:
+                updated_raw = _put(client)
+
+        new_weights: dict[str, float] = {}
+        for mv in updated_raw.get("multivariate_feature_state_values", []) or []:
+            option = mv.get("multivariate_feature_option") or {}
+            opt_val = option.get("value") if isinstance(option, dict) else mv.get("value")
+            if opt_val is not None:
+                new_weights[str(opt_val)] = float(mv.get("percentage_allocation", 0.0))
+
+        new_enabled = bool(updated_raw.get("enabled", snapshot.enabled))
+        raw_val = updated_raw.get("feature_state_value")
+        new_default = None if raw_val is None else str(raw_val)
+        return PilotFlagSnapshot(
+            environment_id=str(environment_id),
+            feature_name=snapshot.feature_name,
+            feature_state_id=snapshot.feature_state_id,
+            enabled=new_enabled,
+            default_value=new_default,
+            multivariate_weights=new_weights or dict(desired_weights),
+            config_hash=compute_pilot_config_hash(new_enabled, new_default, new_weights or desired_weights),
+            raw=updated_raw,
+        )

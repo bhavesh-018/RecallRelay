@@ -3,6 +3,7 @@ import {
   ApiError,
   type AgentProposalItem,
   type AgentRunItem,
+  applyAgentProposal,
   approveAgentProposal,
   listAgentProposals,
   rejectAgentProposal,
@@ -93,6 +94,21 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
       await refresh();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Proposal decision failed.');
+      await refresh();
+    }
+  }
+
+  async function handleApply(prop: AgentProposalItem) {
+    setError(null);
+    setNotice(null);
+    try {
+      const res = await applyAgentProposal(prop.id, prop.revision);
+      setNotice(
+        `Proposal ${res.proposal_id} ${res.status}${res.reconciled_after_timeout ? ' (reconciled via readback after timeout)' : ''}.`,
+      );
+      await refresh();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Apply & verify failed.');
       await refresh();
     }
   }
@@ -238,6 +254,18 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
                   className="rounded-md bg-[#3B82F6] px-3.5 py-1.5 text-xs font-medium text-white hover:opacity-90"
                 >
                   Approve Revision #{prop.revision}
+                </button>
+              </div>
+            )}
+
+            {prop.status === 'approved' && prop.diff.recommendation_type === 'change_workflow' && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => void handleApply(prop)}
+                  className="rounded-md bg-emerald-600 px-3.5 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
+                >
+                  Apply &amp; Verify in Pilot
                 </button>
               </div>
             )}

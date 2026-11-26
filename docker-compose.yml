@@ -1,3 +1,15 @@
+x-flagsmith-env: &flagsmith-env
+  DATABASE_URL: postgresql://postgres:password@flagsmith-postgres:5432/flagsmith
+  USE_POSTGRES_FOR_ANALYTICS: "true"
+  EXPERIMENTATION_ENABLED: "true"
+  ENVIRONMENT: production
+  DJANGO_ALLOWED_HOSTS: "*"
+  FLAGSMITH_DOMAIN: localhost:8000
+  DJANGO_SECRET_KEY: ${FLAGSMITH_DJANGO_SECRET_KEY:-recallrelay-local-flagsmith-secret}
+  WAREHOUSE_CREDENTIALS_SECRET: ${FLAGSMITH_WAREHOUSE_SECRET:-recallrelay-local-warehouse-secret}
+  TASK_RUN_METHOD: TASK_PROCESSOR
+  PROMETHEUS_ENABLED: "true"
+
 services:
   postgres:
     image: postgres:15.5-alpine
@@ -17,5 +29,60 @@ services:
       timeout: 3s
       retries: 20
 
+  flagsmith-postgres:
+    image: postgres:15.5-alpine
+    profiles: ["flagsmith"]
+    container_name: recallrelay_flagsmith_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: flagsmith
+    volumes:
+      - flagsmith_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d flagsmith -U postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  flagsmith-migrate:
+    image: docker.flagsmith.com/flagsmith/flagsmith:latest
+    profiles: ["flagsmith"]
+    command: ["migrate"]
+    environment:
+      <<: *flagsmith-env
+    depends_on:
+      flagsmith-postgres:
+        condition: service_healthy
+
+  flagsmith:
+    image: docker.flagsmith.com/flagsmith/flagsmith:latest
+    profiles: ["flagsmith"]
+    container_name: recallrelay_flagsmith
+    restart: unless-stopped
+    command: ["serve"]
+    environment:
+      <<: *flagsmith-env
+    ports:
+      - "8000:8000"
+    depends_on:
+      flagsmith-migrate:
+        condition: service_completed_successfully
+
+  flagsmith-task-processor:
+    image: docker.flagsmith.com/flagsmith/flagsmith:latest
+    profiles: ["flagsmith"]
+    container_name: recallrelay_flagsmith_processor
+    restart: unless-stopped
+    command: ["run-task-processor"]
+    environment:
+      <<: *flagsmith-env
+    ports:
+      - "8001:8000"
+    depends_on:
+      flagsmith-migrate:
+        condition: service_completed_successfully
+
 volumes:
   recallrelay_pgdata:
+  flagsmith_pgdata:
