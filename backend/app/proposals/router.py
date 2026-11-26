@@ -14,6 +14,7 @@ from app.core.config import Settings, get_settings
 from app.core.database import get_db
 from app.experiments.flagsmith_client import FlagsmithManagementClient
 from app.models.domain import AgentProposal, AgentRun, AgentToolCall, AuditEvent
+from app.proposals.executor import apply_and_verify_proposal
 from app.proposals.orchestrator import LLMCallable, run_bounded_agent_loop
 from app.proposals.tools import get_pilot_flag
 
@@ -262,3 +263,23 @@ def reject_proposal(
     db.commit()
     db.refresh(proposal)
     return _serialize_proposal(proposal)
+
+
+@router.post("/proposals/{proposal_id}/apply")
+def apply_proposal(
+    proposal_id: str,
+    body: ProposalDecisionRequest,
+    operator: OperatorSessionInfo = Depends(require_operator),
+    settings: Settings = Depends(get_settings),
+    db: Session = Depends(get_db),
+    mgmt_client: FlagsmithManagementClient | None = Depends(get_mgmt_client),
+) -> dict[str, object]:
+    """Apply an approved proposal revision to Flagsmith Management API and verify readback."""
+    return apply_and_verify_proposal(
+        db,
+        proposal_id=proposal_id,
+        revision=body.revision,
+        actor=operator.actor,
+        settings=settings,
+        mgmt_client=mgmt_client,
+    )
