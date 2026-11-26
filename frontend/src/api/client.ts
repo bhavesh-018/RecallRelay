@@ -183,6 +183,65 @@ export interface PracticeResetResponse {
   recalls_deleted: number;
 }
 
+export interface DrillSessionState {
+  session_id: string;
+  participant_alias: string;
+  identity: string;
+  scoped_token: string;
+  scenario_id: string;
+  banner: string;
+  batch_code: string;
+  product_name: string;
+  location_name: string;
+  notice_text: string;
+  received: number;
+  forwarded: number;
+  variant: 'standard' | 'guided' | null;
+  is_practice: boolean;
+  validity_status: string;
+  outcome: string | null;
+  attempts: number;
+  incorrect_attempts: number;
+  exposure_at: string | null;
+  started_at: string | null;
+  finalized_at: string | null;
+  elapsed_seconds: number | null;
+  remaining_seconds: number;
+  completed_seconds: number | null;
+  deadline_seconds: number;
+  resumed?: boolean;
+  idempotent_duplicate?: boolean;
+  late_completion_recorded?: boolean;
+}
+
+export interface VariantSummaryStats {
+  exposed_n: number;
+  success_n: number;
+  timeout_n: number;
+  abandoned_n: number;
+  conversion_rate_pct: number;
+  median_completion_seconds: number | null;
+  total_incorrect_attempts: number;
+}
+
+export interface ExperimentSummaryResponse {
+  feature_name: string;
+  include_practice: boolean;
+  total_sessions: number;
+  valid_exposed_n: number;
+  excluded_n: number;
+  exclusions_by_reason: Record<string, number>;
+  variants: {
+    standard: VariantSummaryStats;
+    guided: VariantSummaryStats;
+  };
+  outbox: {
+    pending: number;
+    dispatched: number;
+    failed: number;
+  };
+}
+
 export class ApiError extends Error {
   status: number;
   code: string;
@@ -339,4 +398,59 @@ export async function getTaskQr(taskId: string, baseUrl?: string): Promise<TaskQ
 
 export async function resetPracticeFixture(): Promise<PracticeResetResponse> {
   return apiFetch<PracticeResetResponse>('/api/practice/reset', { method: 'POST' });
+}
+
+export async function startDrillSession(scopedToken: string): Promise<DrillSessionState> {
+  return apiFetch<DrillSessionState>(
+    `/api/sessions/${encodeURIComponent(scopedToken)}/start`,
+    { method: 'POST' },
+    null,
+  );
+}
+
+export async function acknowledgeSessionRendered(scopedToken: string): Promise<DrillSessionState> {
+  return apiFetch<DrillSessionState>(
+    `/api/sessions/${encodeURIComponent(scopedToken)}/rendered`,
+    { method: 'POST' },
+    null,
+  );
+}
+
+export async function submitDrillSession(
+  scopedToken: string,
+  payload: TaskResponsePayload,
+): Promise<DrillSessionState> {
+  return apiFetch<DrillSessionState>(
+    `/api/sessions/${encodeURIComponent(scopedToken)}/submit`,
+    { method: 'POST', body: JSON.stringify(payload) },
+    null,
+  );
+}
+
+export async function getExperimentSummary(includePractice = false): Promise<ExperimentSummaryResponse> {
+  return apiFetch<ExperimentSummaryResponse>(
+    `/api/experiments/summary?include_practice=${includePractice ? 'true' : 'false'}`,
+  );
+}
+
+export async function dispatchExperimentOutbox(): Promise<{
+  attempted: number;
+  dispatched: number;
+  failed: number;
+  pending_remaining: number;
+}> {
+  return apiFetch('/api/experiments/outbox/dispatch', { method: 'POST' });
+}
+
+export async function downloadExperimentCsv(includePractice = false): Promise<string> {
+  const token = getStoredOperatorToken();
+  const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+  const res = await fetch(
+    `/api/experiments/export.csv?include_practice=${includePractice ? 'true' : 'false'}`,
+    { headers, credentials: 'include' },
+  );
+  if (!res.ok) {
+    throw new ApiError(res.status, 'EXPORT_FAILED', 'Operator sign-in required to export CSV.');
+  }
+  return res.text();
 }
