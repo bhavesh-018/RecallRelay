@@ -1,0 +1,117 @@
+{
+  "dataset_key": "coldchain_drill",
+  "locations": [
+    {
+      "id": "plant_west",
+      "name": "BioCold Plant West",
+      "role": "manufacturer",
+      "parent_id": null
+    },
+    {
+      "id": "depot_alpha",
+      "name": "Regional Depot Alpha",
+      "role": "distributor",
+      "parent_id": "plant_west"
+    },
+    {
+      "id": "depot_beta",
+      "name": "Regional Depot Beta",
+      "role": "distributor",
+      "parent_id": "plant_west"
+    },
+    {
+      "id": "clinic_1",
+      "name": "Harbor Clinic 1",
+      "role": "clinic",
+      "parent_id": "depot_alpha"
+    },
+    {
+      "id": "clinic_2",
+      "name": "Valley Clinic 2",
+      "role": "clinic",
+      "parent_id": "depot_alpha"
+    },
+    {
+      "id": "clinic_3",
+      "name": "Metro Clinic 3",
+      "role": "clinic",
+      "parent_id": "depot_beta"
+    }
+  ],
+  "batches": [
+    {
+      "id": "batch_med404",
+      "product_name": "VitaCold Electrolyte Pack 250ml",
+      "batch_code": "MED-404",
+      "opening_location_id": "plant_west",
+      "opening_quantity": 240,
+      "is_practice": false
+    },
+    {
+      "id": "batch_med405",
+      "product_name": "VitaCold Electrolyte Pack 250ml",
+      "batch_code": "MED-405",
+      "opening_location_id": "plant_west",
+      "opening_quantity": 120,
+      "is_practice": false
+    }
+  ],
+  "shipments": [
+    {
+      "id": "ship_m404_1",
+      "batch_code": "MED-404",
+      "sender_id": "plant_west",
+      "receiver_id": "depot_alpha",
+      "quantity": 90,
+      "accepted_at": "2026-11-25T08:00:00Z"
+    },
+    {
+      "id": "ship_m404_2",
+      "batch_code": "MED-404",
+      "sender_id": "plant_west",
+      "receiver_id": "depot_beta",
+      "quantity": 70,
+      "accepted_at": "2026-11-25T08:30:00Z"
+    },
+    {
+      "id": "ship_m404_3",
+      "batch_code": "MED-404",
+      "sender_id": "depot_alpha",
+      "receiver_id": "clinic_1",
+      "quantity": 35,
+      "accepted_at": "2026-11-25T10:00:00Z"
+    },
+    {
+      "id": "ship_m404_4",
+      "batch_code": "MED-404",
+      "sender_id": "depot_alpha",
+      "receiver_id": "clinic_2",
+      "quantity": 25,
+      "accepted_at": "2026-11-25T10:15:00Z"
+    },
+    {
+      "id": "ship_m404_5",
+      "batch_code": "MED-404",
+      "sender_id": "depot_beta",
+      "receiver_id": "clinic_3",
+      "quantity": 45,
+      "accepted_at": "2026-11-25T11:00:00Z"
+    },
+    {
+      "id": "ship_m405_1",
+      "batch_code": "MED-405",
+      "sender_id": "plant_west",
+      "receiver_id": "depot_alpha",
+      "quantity": 50,
+      "accepted_at": "2026-11-25T12:00:00Z"
+    },
+    {
+      "id": "ship_m405_2",
+      "batch_code": "MED-405",
+      "sender_id": "depot_alpha",
+      "receiver_id": "clinic_1",
+      "quantity": 20,
+      "accepted_at": "2026-11-25T13:00:00Z"
+    }
+  ]
+}
