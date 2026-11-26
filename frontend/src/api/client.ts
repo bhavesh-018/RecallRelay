@@ -242,6 +242,49 @@ export interface ExperimentSummaryResponse {
   };
 }
 
+export interface AgentProposalItem {
+  id: string;
+  drill_id: string;
+  target_environment: string;
+  target_feature: string;
+  baseline_config_hash: string;
+  diff: Record<string, unknown>;
+  evidence_ids: string[];
+  rationale: string;
+  status: string;
+  revision: number;
+  approver: string | null;
+  approved_at: string | null;
+  apply_idempotency_key?: string | null;
+  created_at: string;
+}
+
+export interface AgentRunItem {
+  id: string;
+  drill_id: string;
+  state: string;
+  attempts: number;
+  model_name: string;
+  error_message: string | null;
+  created_at: string;
+  tool_calls: Array<{
+    tool_name: string;
+    status: string;
+    duration_ms: number;
+    input_hash?: string;
+    output_hash?: string;
+  }>;
+}
+
+export interface AgentRunResponse {
+  run_id: string;
+  state: string;
+  attempts: number;
+  tool_calls: Array<{ tool_name: string; status: string; duration_ms: number }>;
+  error: string | null;
+  proposal: AgentProposalItem | null;
+}
+
 export class ApiError extends Error {
   status: number;
   code: string;
@@ -453,4 +496,38 @@ export async function downloadExperimentCsv(includePractice = false): Promise<st
     throw new ApiError(res.status, 'EXPORT_FAILED', 'Operator sign-in required to export CSV.');
   }
   return res.text();
+}
+
+export async function triggerAgentRun(drillId: string, instruction: string): Promise<AgentRunResponse> {
+  return apiFetch<AgentRunResponse>('/api/agent/runs', {
+    method: 'POST',
+    body: JSON.stringify({ drill_id: drillId, instruction }),
+  });
+}
+
+export async function listAgentProposals(): Promise<{
+  proposals: AgentProposalItem[];
+  runs: AgentRunItem[];
+}> {
+  return apiFetch('/api/agent/proposals');
+}
+
+export async function approveAgentProposal(
+  proposalId: string,
+  revision: number,
+): Promise<AgentProposalItem> {
+  return apiFetch<AgentProposalItem>(`/api/agent/proposals/${encodeURIComponent(proposalId)}/approve`, {
+    method: 'POST',
+    body: JSON.stringify({ revision }),
+  });
+}
+
+export async function rejectAgentProposal(
+  proposalId: string,
+  revision: number,
+): Promise<AgentProposalItem> {
+  return apiFetch<AgentProposalItem>(`/api/agent/proposals/${encodeURIComponent(proposalId)}/reject`, {
+    method: 'POST',
+    body: JSON.stringify({ revision }),
+  });
 }
