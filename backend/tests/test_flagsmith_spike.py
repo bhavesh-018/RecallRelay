@@ -326,3 +326,76 @@ def test_management_client_resolves_integer_mv_option_ids_and_token_fallback() -
         )
         assert updated.multivariate_weights == {"guided": 100.0, "standard": 0.0}
         assert put_payloads[0]["multivariate_feature_state_values"][0]["percentage_allocation"] == 100.0
+
+
+def test_management_client_updates_v2_versioned_environment() -> None:
+    """Flagsmith Cloud v2 versioned environments create, update, and publish a feature version."""
+    calls: list[tuple[str, str]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        url = str(request.url)
+        calls.append((request.method, url))
+        if request.method == "GET" and "/environments/env-v2/featurestates/" in url:
+            return httpx.Response(
+                200,
+                json={
+                    "results": [
+                        {
+                            "id": 1882416,
+                            "enabled": True,
+                            "feature_state_value": "standard",
+                            "feature": 306168,
+                            "environment": 119111,
+                            "environment_feature_version": "ver-live-1",
+                            "multivariate_feature_state_values": [
+                                {"id": 387076, "multivariate_feature_option": 37423, "percentage_allocation": 50.0}
+                            ],
+                        }
+                    ]
+                },
+            )
+        if request.method == "GET" and url.endswith("/environments/env-v2/"):
+            return httpx.Response(200, json={"id": 119111, "project": 55588})
+        if request.method == "GET" and "/projects/55588/features/306168/" in url:
+            return httpx.Response(
+                200,
+                json={"id": 306168, "multivariate_options": [{"id": 37423, "string_value": "guided"}]},
+            )
+        if request.method == "POST" and url.endswith("/environments/119111/features/306168/versions/"):
+            return httpx.Response(201, json={"uuid": "ver-draft-2"})
+        if request.method == "GET" and url.endswith("/versions/ver-draft-2/featurestates/"):
+            return httpx.Response(
+                200,
+                json=[
+                    {
+                        "id": 1882999,
+                        "feature": 306168,
+                        "enabled": True,
+                        "feature_segment": None,
+                        "identity": None,
+                        "feature_state_value": {"type": "unicode", "string_value": "standard"},
+                        "multivariate_feature_state_values": [
+                            {"id": 387999, "multivariate_feature_option": 37423, "percentage_allocation": 50.0}
+                        ],
+                    }
+                ],
+            )
+        if request.method == "PUT" and url.endswith("/versions/ver-draft-2/featurestates/1882999/"):
+            import json as _json
+            body = _json.loads(request.content.decode("utf-8"))
+            assert body["multivariate_feature_state_values"][0]["percentage_allocation"] == 100.0
+            return httpx.Response(200, json=body)
+        if request.method == "POST" and url.endswith("/versions/ver-draft-2/publish/"):
+            return httpx.Response(200, json={"uuid": "ver-draft-2", "published": True})
+        return httpx.Response(404)
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as http_client:
+        mgmt = FlagsmithManagementClient(
+            management_token="Token acct-token",
+            admin_api_url="https://api.flagsmith.com/api/v1/",
+            http_client=http_client,
+        )
+        snap = mgmt.read_pilot_flag("env-v2", "recall_response_flow")
+        updated = mgmt.update_pilot_multivariate_weights("env-v2", snap, {"guided": 100.0, "standard": 0.0})
+        assert updated.multivariate_weights == {"guided": 100.0, "standard": 0.0}
+        assert any(m == "POST" and u.endswith("/versions/ver-draft-2/publish/") for m, u in calls)

@@ -371,6 +371,79 @@ class FlagsmithManagementClient:
             option_value_map=option_map,
         )
 
+    def _update_via_v2_version(
+        self,
+        client: httpx.Client,
+        snapshot: PilotFlagSnapshot,
+        desired_weights: Mapping[str, float],
+    ) -> dict[str, Any]:
+        env_num = snapshot.raw.get("environment")
+        feat_ref = snapshot.raw.get("feature")
+        feat_id = feat_ref.get("id") if isinstance(feat_ref, dict) else feat_ref
+        if not env_num or not feat_id:
+            raise ValueError("Missing numeric environment or feature ID for Flagsmith v2 versioning.")
+
+        ver_base = f"{self._base_url}/environments/{env_num}/features/{feat_id}/versions"
+        ver_resp = self._request_with_auth(
+            client,
+            "POST",
+            f"{ver_base}/",
+            json_body={"description": "RecallRelay operator-approved pilot workflow update"},
+        )
+        version_uuid = ver_resp.json()["uuid"]
+
+        fs_list_resp = self._request_with_auth(
+            client,
+            "GET",
+            f"{ver_base}/{version_uuid}/featurestates/",
+        )
+        fs_items = fs_list_resp.json()
+        if isinstance(fs_items, dict):
+            fs_items = fs_items.get("results", [])
+        draft_fs = next(
+            (
+                item
+                for item in fs_items
+                if item.get("feature_segment") is None and item.get("identity") is None
+            ),
+            fs_items[0],
+        )
+
+        mv_items = []
+        for mv in draft_fs.get("multivariate_feature_state_values", []) or []:
+            option = mv.get("multivariate_feature_option")
+            if isinstance(option, dict):
+                opt_val = option.get("value")
+            elif isinstance(option, int) and option in snapshot.option_value_map:
+                opt_val = snapshot.option_value_map[option]
+            else:
+                opt_val = mv.get("value")
+            updated_mv = dict(mv)
+            if opt_val is not None and str(opt_val) in desired_weights:
+                updated_mv["percentage_allocation"] = float(desired_weights[str(opt_val)])
+            mv_items.append(updated_mv)
+
+        put_payload = {
+            "id": draft_fs["id"],
+            "feature": feat_id,
+            "enabled": bool(draft_fs.get("enabled", snapshot.enabled)),
+            "feature_state_value": draft_fs.get("feature_state_value"),
+            "multivariate_feature_state_values": mv_items,
+        }
+        updated_resp = self._request_with_auth(
+            client,
+            "PUT",
+            f"{ver_base}/{version_uuid}/featurestates/{draft_fs['id']}/",
+            json_body=put_payload,
+        )
+        self._request_with_auth(
+            client,
+            "POST",
+            f"{ver_base}/{version_uuid}/publish/",
+            json_body={},
+        )
+        return updated_resp.json()
+
     def update_pilot_multivariate_weights(
         self,
         environment_id: str,
@@ -378,6 +451,7 @@ class FlagsmithManagementClient:
         desired_weights: Mapping[str, float],
     ) -> PilotFlagSnapshot:
         """Apply updated multivariate percentage allocations to an allowlisted pilot feature state."""
+        use_v2 = bool(snapshot.raw.get("environment_feature_version"))
         url = f"{self._base_url}/environments/{environment_id}/featurestates/{snapshot.feature_state_id}/"
 
         mv_items = []
@@ -404,6 +478,8 @@ class FlagsmithManagementClient:
             payload["feature"] = snapshot.raw["feature"]
 
         def _put(client: httpx.Client) -> dict[str, Any]:
+            if use_v2:
+                return self._update_via_v2_version(client, snapshot, desired_weights)
             resp = self._request_with_auth(client, "PUT", url, json_body=payload)
             return resp.json()
 
@@ -415,12 +491,14 @@ class FlagsmithManagementClient:
 
         new_enabled = bool(updated_raw.get("enabled", snapshot.enabled))
         raw_val = updated_raw.get("feature_state_value")
+        if isinstance(raw_val, dict):
+            raw_val = raw_val.get("string_value")
         new_default = None if raw_val is None else str(raw_val)
         new_weights = self._extract_weights(updated_raw, new_default, snapshot.option_value_map)
         return PilotFlagSnapshot(
             environment_id=str(environment_id),
             feature_name=snapshot.feature_name,
-            feature_state_id=snapshot.feature_state_id,
+            feature_state_id=int(updated_raw.get("id", snapshot.feature_state_id)),
             enabled=new_enabled,
             default_value=new_default,
             multivariate_weights=new_weights or dict(desired_weights),
