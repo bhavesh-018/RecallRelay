@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import {
   ApiError,
   type ScopedTaskView,
@@ -7,10 +7,17 @@ import {
   getScopedTask,
   submitTaskResponse,
 } from '../../api/client';
-import { RecallFlow, type RecallFlowValues } from '../../components/RecallFlow';
+import {
+  RecallFlow,
+  type RecallFlowValues,
+  type RecallWorkflowMode,
+} from '../../components/RecallFlow';
 
 export function ParticipantTaskPage() {
   const { token } = useParams<{ token: string }>();
+  const [searchParams] = useSearchParams();
+  const requestedFlow = searchParams.get('flow');
+  const workflowMode: RecallWorkflowMode = requestedFlow === 'guided' ? 'guided' : 'standard';
   const [task, setTask] = useState<ScopedTaskView | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -154,7 +161,7 @@ export function ParticipantTaskPage() {
           noticeText={task.notice_text}
           received={task.received}
           forwarded={task.forwarded}
-          workflow="standard"
+          workflow={workflowMode}
           initialValues={task.current_response ?? undefined}
           submitting={submitting}
           errorMessage={submitError}

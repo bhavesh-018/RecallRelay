@@ -17,12 +17,12 @@
 - [x] **Phase 6 (`feature/access-integration`):** Host-aware QR URLs, practice-only reset endpoint, `cloudflared` HTTPS mobile test, Day 1 Gate.
 
 ## Day 2 · November 27 — Experiment & Bounded Agent
-- [ ] **Phase 7 (`feature/phase-7-guided-workflow`):** `RecallFlow` `guided` step-by-step mode + Playwright mobile checks.
-- [ ] **Phase 8 (`feature/phase-8-verified-measurement`):** `DrillSession` identity, 300s cutoff, `EventOutbox`, unique success, CSV export.
-- [ ] **Phase 9 (`feature/phase-9-practice-freeze`):** 2–4 practice testers, wording fixes, freeze `Study` configuration.
+- [x] **Phase 7 (`feature/guided-workflow`):** `RecallFlow` `guided` step-by-step mode + Playwright mobile checks.
+- [ ] **Phase 8 (`feature/verified-measurement`):** `DrillSession` identity, 300s cutoff, `EventOutbox`, unique success, CSV export.
+- [ ] **Phase 9 (`feature/practice-freeze`):** 2–4 practice testers, wording fixes, freeze `Study` configuration.
 - [ ] **Phase 10 (Live Ops):** Study Block 1 collection (frozen codebase).
-- [ ] **Phase 11 (`feature/phase-11-agent-workbench`):** Evidence tools, bounded LLM orchestrator, deterministic validator, Agent Workbench UI.
-- [ ] **Phase 12 (`feature/phase-12-agent-integration`):** Flagsmith Management API apply/readback, stale-hash recovery, self-hosted config recovery, Study Block 2.
+- [ ] **Phase 11 (`feature/agent-workbench`):** Evidence tools, bounded LLM orchestrator, deterministic validator, Agent Workbench UI.
+- [ ] **Phase 12 (`feature/agent-integration`):** Flagsmith Management API apply/readback, stale-hash recovery, self-hosted config recovery, Study Block 2.
 
 ## Day 3 · November 28 — Verification, Reuse & Freeze
 - [ ] **Phase 13 (`feature/phase-13-reliability-evals`):** 9 adversarial agent eval scenarios, accounting/outbox hardening.
