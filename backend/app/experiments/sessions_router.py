@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings, get_settings
 from app.core.database import get_db
 from app.experiments.flagsmith_client import FlagsmithAdapter
+from app.experiments.outbox import dispatch_pending_outbox, enqueue_outbox_event
 from app.experiments.sessions import (
     STUDY_DEADLINE_SECONDS,
     as_utc,
@@ -149,6 +150,7 @@ def start_drill_session(
 def acknowledge_session_rendered(
     scoped_token: str,
     db: Session = Depends(get_db),
+    adapter_factory: Callable[[bool], FlagsmithAdapter] = Depends(get_adapter_factory),
     clock: Callable[[], datetime] = Depends(get_clock),
 ) -> dict[str, object]:
     """Record that a usable workflow rendered on the participant device."""
@@ -164,6 +166,14 @@ def acknowledge_session_rendered(
     if session.started_at is None:
         session.started_at = now
         session.validity_status = "valid"
+        enqueue_outbox_event(
+            db,
+            logical_event_id=f"{session.id}:started",
+            identity=session.identity,
+            event_name="recall_drill_started",
+            value=session.variant,
+            metadata={"scenario_id": session.scenario_id, "is_practice": session.is_practice},
+        )
         db.add(
             AuditEvent(
                 actor=session.identity,
@@ -174,6 +184,11 @@ def acknowledge_session_rendered(
             )
         )
         db.commit()
+        adapter = adapter_factory(session.is_practice)
+        try:
+            dispatch_pending_outbox(db, adapter)
+        finally:
+            adapter.close()
         db.refresh(session)
 
     return serialize_session_state(session, now)
@@ -184,6 +199,7 @@ def submit_drill_session(
     scoped_token: str,
     body: SessionSubmitRequest,
     db: Session = Depends(get_db),
+    adapter_factory: Callable[[bool], FlagsmithAdapter] = Depends(get_adapter_factory),
     clock: Callable[[], datetime] = Depends(get_clock),
 ) -> dict[str, object]:
     """Validate participant counts against ground truth and enforce 300s primary cutoff."""
@@ -208,6 +224,15 @@ def submit_drill_session(
         session.started_at = session.exposure_at
     if session.validity_status == "exposed":
         session.validity_status = "valid"
+
+    enqueue_outbox_event(
+        db,
+        logical_event_id=f"{session.id}:submitted:{session.attempts}",
+        identity=session.identity,
+        event_name="recall_response_submitted",
+        value=session.attempts,
+        metadata={"variant": session.variant, "is_practice": session.is_practice},
+    )
 
     try:
         validate_stock_balance(
@@ -276,6 +301,32 @@ def submit_drill_session(
         session.outcome = "success"
         session.finalized_at = now
         audit_action = "recall_drill_success"
+        enqueue_outbox_event(
+            db,
+            logical_event_id=f"{session.id}:success",
+            identity=session.identity,
+            event_name="recall_drill_success",
+            value=1,
+            metadata={
+                "variant": session.variant,
+                "elapsed_seconds": elapsed,
+                "is_practice": session.is_practice,
+            },
+        )
+
+    enqueue_outbox_event(
+        db,
+        logical_event_id=f"{session.id}:finalized",
+        identity=session.identity,
+        event_name="recall_drill_finalized",
+        value=session.outcome,
+        metadata={
+            "variant": session.variant,
+            "elapsed_seconds": elapsed,
+            "late_completion": late_completion,
+            "is_practice": session.is_practice,
+        },
+    )
 
     db.add(
         AuditEvent(
@@ -293,6 +344,11 @@ def submit_drill_session(
         )
     )
     db.commit()
+    adapter = adapter_factory(session.is_practice)
+    try:
+        dispatch_pending_outbox(db, adapter)
+    finally:
+        adapter.close()
     db.refresh(session)
 
     data = serialize_session_state(session, now)
@@ -328,6 +384,14 @@ def finalize_drill_session(
             session.validity_status = "valid"
 
     session.finalized_at = now
+    enqueue_outbox_event(
+        db,
+        logical_event_id=f"{session.id}:finalized",
+        identity=session.identity,
+        event_name="recall_drill_finalized",
+        value=session.outcome,
+        metadata={"variant": session.variant, "is_practice": session.is_practice},
+    )
     db.add(
         AuditEvent(
             actor=session.identity,
