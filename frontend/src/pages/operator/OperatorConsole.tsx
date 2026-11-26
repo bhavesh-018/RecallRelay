@@ -8,10 +8,11 @@ import {
   setStoredOperatorToken,
 } from '../../api/client';
 import { BatchTraceView } from './BatchTraceView';
+import { ExperimentSummaryView } from './ExperimentSummaryView';
 import { OperatorOverview } from './OperatorOverview';
 import { RecallPublishView } from './RecallPublishView';
 
-type OperatorTab = 'overview' | 'trace' | 'publish';
+type OperatorTab = 'overview' | 'trace' | 'publish' | 'experiment';
 
 export function OperatorConsole() {
   const [activeTab, setActiveTab] = useState<OperatorTab>('overview');
@@ -62,6 +63,7 @@ export function OperatorConsole() {
               { id: 'overview', label: 'Overview' },
               { id: 'trace', label: 'Batch Trace' },
               { id: 'publish', label: 'Publish Recall' },
+              { id: 'experiment', label: 'Experiment' },
             ] as const
           ).map((tab) => (
             <button
@@ -137,6 +139,9 @@ export function OperatorConsole() {
           operatorAuthenticated={operatorAuthed}
           onPublished={handlePublished}
         />
+      )}
+      {activeTab === 'experiment' && (
+        <ExperimentSummaryView operatorAuthenticated={operatorAuthed} />
       )}
     </main>
   );
