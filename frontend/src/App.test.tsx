@@ -1,10 +1,32 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import { vi } from 'vitest';
 import { App } from './App';
 
-describe('App baseline shell', () => {
-  it('renders the RecallRelay operator header and console title', () => {
+describe('App operator console shell', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('renders RecallRelay navigation and empty-recall prompt cleanly', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes('/api/operator/me')) {
+        return new Response(JSON.stringify({ detail: 'Unauthorized' }), { status: 401 });
+      }
+      if (url.includes('/api/recalls')) {
+        return new Response(JSON.stringify({ recalls: [] }), { status: 200 });
+      }
+      return new Response(JSON.stringify({}), { status: 200 });
+    });
+
     render(<App />);
     expect(screen.getByText('RecallRelay')).toBeInTheDocument();
-    expect(screen.getByText('RecallRelay Operator Console')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Overview' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Batch Trace' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Publish Recall' })).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('No Active Recall Published')).toBeInTheDocument();
+    });
   });
 });
