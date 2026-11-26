@@ -37,13 +37,14 @@ def run_llm_smoke_check(
         if provider == "gemini":
             url = (
                 f"https://generativelanguage.googleapis.com/v1beta/models/"
-                f"{model}:generateContent?key={api_key}"
+                f"{model}:generateContent"
             )
+            headers = {"x-goog-api-key": api_key}
             body = {
                 "contents": [{"parts": [{"text": "Reply with exactly one word: OK"}]}],
                 "generationConfig": {"maxOutputTokens": 16, "temperature": 0},
             }
-            resp = client.post(url, json=body, timeout=15.0)
+            resp = client.post(url, headers=headers, json=body, timeout=15.0)
             resp.raise_for_status()
             data = resp.json()
             text = (

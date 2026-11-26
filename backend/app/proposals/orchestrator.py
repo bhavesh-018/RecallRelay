@@ -75,8 +75,9 @@ def _default_llm_call(
         if provider == "gemini":
             url = (
                 f"https://generativelanguage.googleapis.com/v1beta/models/"
-                f"{model}:generateContent?key={api_key}"
+                f"{model}:generateContent"
             )
+            headers = {"x-goog-api-key": api_key}
             body = {
                 "contents": [{"parts": [{"text": full_prompt}]}],
                 "generationConfig": {
@@ -84,7 +85,7 @@ def _default_llm_call(
                     "responseMimeType": "application/json",
                 },
             }
-            resp = client.post(url, json=body)
+            resp = client.post(url, headers=headers, json=body)
             resp.raise_for_status()
             data = resp.json()
             text = data["candidates"][0]["content"]["parts"][0]["text"]
