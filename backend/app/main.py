@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.auth import router as operator_router
 from app.core.config import Settings, get_settings
+from app.experiments.sessions_router import router as sessions_router
 from app.recalls.access_router import router as access_router
 from app.recalls.router import router as recalls_router
 from app.recalls.tasks_router import router as tasks_router
@@ -40,6 +41,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(recalls_router)
     app.include_router(tasks_router)
     app.include_router(access_router)
+    app.include_router(sessions_router)
     return app
 
 
