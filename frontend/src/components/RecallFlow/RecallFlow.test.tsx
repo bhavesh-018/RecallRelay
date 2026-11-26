@@ -105,4 +105,39 @@ describe('RecallFlow reusable component (standard and guided variants)', () => {
       confirmed_set_aside: true,
     });
   });
+
+  it('reuses cleanly with second_drill MED-404 dataset without hardcoded B17 assumptions', () => {
+    const onSubmit = vi.fn();
+    render(
+      <RecallFlow
+        batchCode="MED-404"
+        productName="VitaCold Electrolyte Pack 250ml"
+        locationName="Harbor Clinic 1"
+        noticeText="Fictional cold-chain drill for MED-404."
+        received={35}
+        forwarded={0}
+        workflow="guided"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    expect(screen.getByText('Harbor Clinic 1')).toBeInTheDocument();
+    expect(screen.getByText('MED-404')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Units Sold'), { target: { value: '12' } });
+    fireEvent.change(screen.getByLabelText('Units Remaining at Location'), { target: { value: '23' } });
+    fireEvent.click(screen.getByRole('button', { name: /Continue to Reconcile/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Continue to Confirm/i }));
+    fireEvent.change(screen.getByLabelText(/Units Set Aside/i), { target: { value: '23' } });
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', { name: 'Submit Recall Response' }));
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      forwarded_qty: 0,
+      sold_qty: 12,
+      remaining_qty: 23,
+      set_aside_qty: 23,
+      confirmed_set_aside: true,
+    });
+  });
 });
