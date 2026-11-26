@@ -18,7 +18,7 @@
 
 ## Day 2 · November 27 — Experiment & Bounded Agent
 - [x] **Phase 7 (`feature/guided-workflow`):** `RecallFlow` `guided` step-by-step mode + Playwright mobile checks.
-- [ ] **Phase 8 (`feature/verified-measurement`):** `DrillSession` identity, 300s cutoff, `EventOutbox`, unique success, CSV export.
+- [x] **Phase 8 (`feature/verified-measurement`):** `DrillSession` identity, 300s cutoff, `EventOutbox`, unique success, CSV export.
 - [ ] **Phase 9 (`feature/practice-freeze`):** 2–4 practice testers, wording fixes, freeze `Study` configuration.
 - [ ] **Phase 10 (Live Ops):** Study Block 1 collection (frozen codebase).
 - [ ] **Phase 11 (`feature/agent-workbench`):** Evidence tools, bounded LLM orchestrator, deterministic validator, Agent Workbench UI.
