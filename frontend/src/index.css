@@ -30,3 +30,18 @@ body {
 .rr-panel-enter {
   animation: rrPanelFade 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+@keyframes rrStepSlide {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.rr-step-slide {
+  animation: rrStepSlide 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
