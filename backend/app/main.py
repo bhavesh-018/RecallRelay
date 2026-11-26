@@ -1,9 +1,11 @@
-"""FastAPI application factory and baseline health endpoint."""
+"""FastAPI application factory and router registration."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.auth import router as operator_router
 from app.core.config import Settings, get_settings
+from app.shipments.router import router as shipments_router
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -30,6 +32,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "port": cfg.app_port,
         }
 
+    app.include_router(operator_router)
+    app.include_router(shipments_router)
     return app
 
 
