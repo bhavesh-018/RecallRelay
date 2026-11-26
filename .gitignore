@@ -1,0 +1,32 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+docs/
+# Node / Frontend
+node_modules/
+dist/
+build/
+.vite/
+playwright-report/
+test-results/
+
+# OS & Editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local smoke-test / temporary files
+docker-compose.flagsmith.yml
+*.log
