@@ -9,7 +9,7 @@
 
 ## Day 1 · November 26 — Complete Recall Path
 - [x] **Pre-Kickoff:** Git `main` initialized, Flagsmith Docker smoke-tested, Cloud `Study`/`Pilot` keys ready, `cloudflared` installed.
-- [/] **Phase 1 (`feature/phase-1-setup`):** `AGENTS.md`, `tasks.md`, `decision_log.md`, FastAPI `:8080` + pytest baseline, React/TS/Vite/Tailwind dark theme baseline.
+- [x] **Phase 1 (`feature/phase-1-setup`):** `AGENTS.md`, `tasks.md`, `decision_log.md`, FastAPI `:8080` + pytest baseline, React/TS/Vite/Tailwind dark theme baseline.
 - [ ] **Phase 2 (`feature/phase-2-flagsmith-spike`):** Flagsmith Python SDK (`>=6.3.0`) remote evaluation, practice `standard`/`guided` exposure + `track_event`, LLM + Management API smoke check. *(90-min timebox on self-hosted events before Cloud study fallback.)*
 - [ ] **Phase 3 (`feature/phase-3-domain-foundation`):** PostgreSQL schema + Alembic, 5-location + `B17`/`B18` seed, shipment trace API, accounting checks, operator auth.
 - [ ] **Phase 4 (`feature/phase-4-recall-lifecycle`):** Idempotent publish, batch-filtered task generation, scoped tokens, `/join` auto-session entry, response revisions, audit history.

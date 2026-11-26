@@ -5,7 +5,6 @@
 ## 1. Branching, Commits & Verification
 - **Never** commit or edit directly on `main`. Always work on `feature/<phase-name>` branched from `main`.
 - Use atomic **Conventional Commits** (`feat:`, `fix:`, `test:`, `refactor:`, `chore:`, `docs:`).
-- Do **not** run `git push` unless explicitly instructed.
 - Every slice must pass automated verification before moving on or merging:
   - Backend: `backend/.venv/Scripts/python.exe -m pytest`
   - Frontend: `npx tsc -b && npm test && npm run build`
