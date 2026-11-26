@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:15.5-alpine
+    container_name: recallrelay_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-recallrelay}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-recallrelay}
+      POSTGRES_DB: ${POSTGRES_DB:-recallrelay}
+    ports:
+      - "5432:5432"
+    volumes:
+      - recallrelay_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-recallrelay} -d ${POSTGRES_DB:-recallrelay}"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  recallrelay_pgdata:
