@@ -3,9 +3,10 @@
 > Single source of truth for domain rules and milestones: `docs/RecallRelay_3_Day_Roadmap.md`.
 
 ## 1. Branching, Commits & Verification
-- **Never** commit or edit directly on `main`. Always work on `feature/<phase-name>` branched from `main`.
+- **Never** commit or edit directly on `main`. Always work on `feature/<work-name>` branched from `main` (e.g., `feature/flagsmith-spike`, `feature/domain-foundation` — do not include `phase-` in branch names).
 - Use atomic **Conventional Commits** (`feat:`, `fix:`, `test:`, `refactor:`, `chore:`, `docs:`).
-- Every slice must pass automated verification before moving on or merging:
+- AI agent commits, pushes the feature branch to `origin`, pulls latest `main` before new branches, and provides the **PR Title & Description**; the human owner merges PRs into `main` on GitHub.
+- Every slice must pass automated verification before moving on or opening a PR:
   - Backend: `backend/.venv/Scripts/python.exe -m pytest`
   - Frontend: `npx tsc -b && npm test && npm run build`
 
