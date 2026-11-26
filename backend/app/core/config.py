@@ -18,7 +18,11 @@ class Settings(BaseSettings):
     flagsmith_study_key: str = ""
     flagsmith_pilot_key: str = ""
     flagsmith_api_url: str = "https://edge.api.flagsmith.com/api/v1/"
+    flagsmith_events_url: str = "https://events.api.flagsmith.com/"
+    flagsmith_admin_api_url: str = "https://api.flagsmith.com/api/v1/"
     flagsmith_management_token: str = ""
+    flagsmith_pilot_env_id: str = ""
+    flagsmith_pilot_feature_name: str = "recall_response_flow"
 
     # Operator authentication
     operator_secret: str = "dev-operator-secret-change-me"
