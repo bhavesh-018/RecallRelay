@@ -30,4 +30,5 @@ Thumbs.db
 
 # Local smoke-test / temporary files
 docker-compose.flagsmith.yml
+exports/
 *.log
