@@ -25,8 +25,8 @@
 - [x] **Phase 12 (`feature/agent-integration`):** Flagsmith Management API apply/readback, stale-hash recovery, self-hosted config recovery, Study Block 2.
 
 ## Day 3 · November 28 — Verification, Reuse & Freeze
-- [ ] **Phase 13 (`feature/phase-13-reliability-evals`):** 9 adversarial agent eval scenarios, accounting/outbox hardening.
+- [x] **Phase 13 (`feature/reliability-evals`):** 9 adversarial agent eval scenarios, accounting/outbox hardening.
 - [ ] **Phase 14 (Live Ops):** Remaining study collection toward 30–40 target.
-- [ ] **Phase 15 (`feature/phase-15-reuse-second-fixture`):** `fixtures/second_drill.json`, reuse tests, manual-vs-assisted timing trials.
-- [ ] **Phase 16 (`feature/phase-16-reproducibility`):** Docker Compose, migrations, seed/reset scripts, `README.md`, license check, clean self-hosted verification.
-- [ ] **Phases 17–19 (`feature/phase-17-19-freeze`):** 4 PM study close, `docs/results.md`, `docs/limitations.md`, release verification, `v1.0.0` freeze by 8 PM IST.
+- [ ] **Phase 15 (`feature/reuse-second-fixture`):** `fixtures/second_drill.json`, reuse tests, manual-vs-assisted timing trials.
+- [ ] **Phase 16 (`feature/reproducibility`):** Docker Compose, migrations, seed/reset scripts, `README.md`, license check, clean self-hosted verification.
+- [ ] **Phases 17–19 (`feature/release-freeze`):** 4 PM study close, `results.md`, `limitations.md`, release verification, `v1.0.0` freeze by 8 PM IST.
