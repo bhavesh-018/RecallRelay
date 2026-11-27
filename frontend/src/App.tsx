@@ -1,5 +1,6 @@
 import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
-import { ShieldAlert, Radio } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
+import { BrandLogo } from './components/BrandLogo';
 import { OperatorConsole } from './pages/operator/OperatorConsole';
 import { JoinDrillPage } from './pages/participant/JoinDrillPage';
 import { ParticipantTaskPage } from './pages/participant/ParticipantTaskPage';
@@ -12,16 +13,8 @@ function AppShell() {
     <div className="min-h-screen bg-[#09090B] text-[#F4F4F5] selection:bg-[#3B82F6]/30 selection:text-white">
       <header className="sticky top-0 z-30 border-b border-[#27272A]/80 bg-[#09090B]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3">
-          <Link to="/" className="group flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md border border-[#3B82F6]/40 bg-[#3B82F6]/15 text-[#60A5FA] transition-colors group-hover:bg-[#3B82F6]/25">
-              <Radio className="h-4 w-4" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-sm font-semibold tracking-tight text-[#F4F4F5]">RecallRelay</span>
-              <span className="hidden rounded border border-[#27272A] bg-[#141417] px-1.5 py-0.5 font-mono text-[10px] text-[#A1A1AA] sm:inline">
-                v1.0
-              </span>
-            </div>
+          <Link to="/" className="group flex items-center gap-2.5 transition-opacity hover:opacity-95">
+            <BrandLogo size="sm" showWordmark subtitle="Supply Chain Recall & Flagsmith Workbench" />
           </Link>
 
           <div className="flex items-center gap-3">

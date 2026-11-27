@@ -25,6 +25,7 @@ import {
   getTaskQr,
   listRecalls,
 } from '../../api/client';
+import { BrandLogo } from '../../components/BrandLogo';
 
 interface OperatorOverviewProps {
   operatorAuthenticated: boolean;
@@ -197,19 +198,23 @@ export function OperatorOverview({
 
   if (!overview) {
     return (
-      <div className="rr-panel-enter rr-surface rounded-xl p-8 text-center space-y-3">
-        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg border border-[#27272A] bg-[#09090B] text-[#60A5FA]">
-          <Package className="h-5 w-5" />
+      <div className="rr-panel-enter rr-surface rounded-xl px-8 py-12 text-center space-y-4">
+        <div className="flex justify-center">
+          <BrandLogo size="lg" />
         </div>
-        <div className="text-sm font-semibold text-[#F4F4F5]">No Active Recall Published</div>
-        <p className="mx-auto max-w-md text-xs leading-relaxed text-[#A1A1AA]">
-          Publish a fictional drill notice for an affected batch to generate scoped participant reconciliation tasks across all reached supply-chain locations.
-        </p>
+        <div className="space-y-1.5">
+          <div className="text-base font-semibold tracking-tight text-[#F4F4F5]">
+            No Active Recall Published
+          </div>
+          <p className="mx-auto max-w-md text-xs leading-relaxed text-[#A1A1AA]">
+            Publish a fictional drill notice for an affected batch to generate scoped participant reconciliation tasks across all reached supply-chain locations.
+          </p>
+        </div>
         <div className="pt-1">
           <button
             type="button"
             onClick={onNavigatePublish}
-            className="rounded-md bg-[#3B82F6] px-4 py-2 text-xs font-medium text-white transition-opacity hover:opacity-90"
+            className="rounded-lg bg-[#3B82F6] px-4 py-2 text-xs font-medium text-white transition-opacity hover:opacity-90"
           >
             Publish Drill Notice
           </button>
