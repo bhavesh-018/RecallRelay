@@ -1,0 +1,313 @@
+{
+  "dataset_key": "demo_large_drill",
+  "locations": [
+    {
+      "id": "mfg_central",
+      "name": "SunGrain Central Mill (Pune)",
+      "role": "manufacturer",
+      "parent_id": null
+    },
+    {
+      "id": "dist_north",
+      "name": "NorthGrid Logistics Hub (Delhi NCR)",
+      "role": "distributor",
+      "parent_id": "mfg_central"
+    },
+    {
+      "id": "dist_west",
+      "name": "WestCoast Depot (Mumbai)",
+      "role": "distributor",
+      "parent_id": "mfg_central"
+    },
+    {
+      "id": "dist_south",
+      "name": "Deccan Regional Hub (Bengaluru)",
+      "role": "distributor",
+      "parent_id": "mfg_central"
+    },
+    {
+      "id": "shop_n1",
+      "name": "Connaught Fresh Market",
+      "role": "shop",
+      "parent_id": "dist_north"
+    },
+    {
+      "id": "shop_n2",
+      "name": "Gurgaon CyberMart",
+      "role": "shop",
+      "parent_id": "dist_north"
+    },
+    {
+      "id": "shop_n3",
+      "name": "Noida Sector 18 Grocers",
+      "role": "shop",
+      "parent_id": "dist_north"
+    },
+    {
+      "id": "shop_n4",
+      "name": "Jaipur Heritage Pantry",
+      "role": "shop",
+      "parent_id": "dist_north"
+    },
+    {
+      "id": "shop_w1",
+      "name": "Bandra Organic Co-op",
+      "role": "shop",
+      "parent_id": "dist_west"
+    },
+    {
+      "id": "shop_w2",
+      "name": "Andheri Metro Superstore",
+      "role": "shop",
+      "parent_id": "dist_west"
+    },
+    {
+      "id": "shop_w3",
+      "name": "Thane Value Mart",
+      "role": "shop",
+      "parent_id": "dist_west"
+    },
+    {
+      "id": "shop_w4",
+      "name": "Surat Harbor Provisions",
+      "role": "shop",
+      "parent_id": "dist_west"
+    },
+    {
+      "id": "shop_s1",
+      "name": "Indiranagar Artisanal Foods",
+      "role": "shop",
+      "parent_id": "dist_south"
+    },
+    {
+      "id": "shop_s2",
+      "name": "Koramangala Daily Basket",
+      "role": "shop",
+      "parent_id": "dist_south"
+    },
+    {
+      "id": "shop_s3",
+      "name": "Whitefield Express Mart",
+      "role": "shop",
+      "parent_id": "dist_south"
+    },
+    {
+      "id": "shop_s4",
+      "name": "Hyderabad Jubilee Grocers",
+      "role": "shop",
+      "parent_id": "dist_south"
+    }
+  ],
+  "batches": [
+    {
+      "id": "batch_b17",
+      "product_name": "SunGrain Crunchy Oats 500g",
+      "batch_code": "B17",
+      "opening_location_id": "mfg_central",
+      "opening_quantity": 500,
+      "is_practice": false
+    },
+    {
+      "id": "batch_b18",
+      "product_name": "SunGrain Crunchy Oats 500g",
+      "batch_code": "B18",
+      "opening_location_id": "mfg_central",
+      "opening_quantity": 320,
+      "is_practice": false
+    }
+  ],
+  "shipments": [
+    {
+      "id": "ship_b17_d1",
+      "batch_code": "B17",
+      "sender_id": "mfg_central",
+      "receiver_id": "dist_north",
+      "quantity": 140,
+      "accepted_at": "2026-11-24T08:30:00Z"
+    },
+    {
+      "id": "ship_b17_d2",
+      "batch_code": "B17",
+      "sender_id": "mfg_central",
+      "receiver_id": "dist_west",
+      "quantity": 160,
+      "accepted_at": "2026-11-24T09:00:00Z"
+    },
+    {
+      "id": "ship_b17_d3",
+      "batch_code": "B17",
+      "sender_id": "mfg_central",
+      "receiver_id": "dist_south",
+      "quantity": 120,
+      "accepted_at": "2026-11-24T09:15:00Z"
+    },
+    {
+      "id": "ship_b17_n1",
+      "batch_code": "B17",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_n1",
+      "quantity": 35,
+      "accepted_at": "2026-11-24T11:00:00Z"
+    },
+    {
+      "id": "ship_b17_n2",
+      "batch_code": "B17",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_n2",
+      "quantity": 30,
+      "accepted_at": "2026-11-24T11:15:00Z"
+    },
+    {
+      "id": "ship_b17_n3",
+      "batch_code": "B17",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_n3",
+      "quantity": 25,
+      "accepted_at": "2026-11-24T11:30:00Z"
+    },
+    {
+      "id": "ship_b17_n4",
+      "batch_code": "B17",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_n4",
+      "quantity": 20,
+      "accepted_at": "2026-11-24T11:45:00Z"
+    },
+    {
+      "id": "ship_b17_w1",
+      "batch_code": "B17",
+      "sender_id": "dist_west",
+      "receiver_id": "shop_w1",
+      "quantity": 40,
+      "accepted_at": "2026-11-24T12:00:00Z"
+    },
+    {
+      "id": "ship_b17_w2",
+      "batch_code": "B17",
+      "sender_id": "dist_west",
+      "receiver_id": "shop_w2",
+      "quantity": 35,
+      "accepted_at": "2026-11-24T12:15:00Z"
+    },
+    {
+      "id": "ship_b17_w3",
+      "batch_code": "B17",
+      "sender_id": "dist_west",
+      "receiver_id": "shop_w3",
+      "quantity": 30,
+      "accepted_at": "2026-11-24T12:30:00Z"
+    },
+    {
+      "id": "ship_b17_w4",
+      "batch_code": "B17",
+      "sender_id": "dist_west",
+      "receiver_id": "shop_w4",
+      "quantity": 25,
+      "accepted_at": "2026-11-24T12:45:00Z"
+    },
+    {
+      "id": "ship_b17_s1",
+      "batch_code": "B17",
+      "sender_id": "dist_south",
+      "receiver_id": "shop_s1",
+      "quantity": 30,
+      "accepted_at": "2026-11-24T13:00:00Z"
+    },
+    {
+      "id": "ship_b17_s2",
+      "batch_code": "B17",
+      "sender_id": "dist_south",
+      "receiver_id": "shop_s2",
+      "quantity": 25,
+      "accepted_at": "2026-11-24T13:15:00Z"
+    },
+    {
+      "id": "ship_b17_s3",
+      "batch_code": "B17",
+      "sender_id": "dist_south",
+      "receiver_id": "shop_s3",
+      "quantity": 25,
+      "accepted_at": "2026-11-24T13:30:00Z"
+    },
+    {
+      "id": "ship_b17_s4",
+      "batch_code": "B17",
+      "sender_id": "dist_south",
+      "receiver_id": "shop_s4",
+      "quantity": 20,
+      "accepted_at": "2026-11-24T13:45:00Z"
+    },
+    {
+      "id": "ship_b18_d1",
+      "batch_code": "B18",
+      "sender_id": "mfg_central",
+      "receiver_id": "dist_north",
+      "quantity": 90,
+      "accepted_at": "2026-11-25T09:00:00Z"
+    },
+    {
+      "id": "ship_b18_d2",
+      "batch_code": "B18",
+      "sender_id": "mfg_central",
+      "receiver_id": "dist_west",
+      "quantity": 100,
+      "accepted_at": "2026-11-25T09:15:00Z"
+    },
+    {
+      "id": "ship_b18_d3",
+      "batch_code": "B18",
+      "sender_id": "mfg_central",
+      "receiver_id": "dist_south",
+      "quantity": 70,
+      "accepted_at": "2026-11-25T09:30:00Z"
+    },
+    {
+      "id": "ship_b18_n1",
+      "batch_code": "B18",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_n1",
+      "quantity": 30,
+      "accepted_at": "2026-11-25T11:00:00Z"
+    },
+    {
+      "id": "ship_b18_n2",
+      "batch_code": "B18",
+      "sender_id": "dist_north",
+      "receiver_id": "shop_n2",
+      "quantity": 25,
+      "accepted_at": "2026-11-25T11:15:00Z"
+    },
+    {
+      "id": "ship_b18_w1",
+      "batch_code": "B18",
+      "sender_id": "dist_west",
+      "receiver_id": "shop_w1",
+      "quantity": 35,
+      "accepted_at": "2026-11-25T11:30:00Z"
+    },
+    {
+      "id": "ship_b18_w2",
+      "batch_code": "B18",
+      "sender_id": "dist_west",
+      "receiver_id": "shop_w2",
+      "quantity": 30,
+      "accepted_at": "2026-11-25T11:45:00Z"
+    },
+    {
+      "id": "ship_b18_s1",
+      "batch_code": "B18",
+      "sender_id": "dist_south",
+      "receiver_id": "shop_s1",
+      "quantity": 25,
+      "accepted_at": "2026-11-25T12:00:00Z"
+    },
+    {
+      "id": "ship_b18_s2",
+      "batch_code": "B18",
+      "sender_id": "dist_south",
+      "receiver_id": "shop_s2",
+      "quantity": 20,
+      "accepted_at": "2026-11-25T12:15:00Z"
+    }
+  ]
+}

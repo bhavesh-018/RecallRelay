@@ -58,6 +58,11 @@ cd ..
 python scripts/seed.py --fixture fixtures/food_drill.json --reset
 ```
 
+To load the larger 16-location, 3-tier demo dataset (`SunGrain Central Mill` → 3 regional hubs → 12 retail stores, 500 units):
+```bash
+python scripts/seed.py --fixture fixtures/demo_large_drill.json --reset
+```
+
 To load the completely distinct second fixture (cold-chain medical vials `MED-404` / `MED-405`) without modifying any core code:
 ```bash
 python scripts/seed.py --fixture fixtures/second_drill.json --reset
