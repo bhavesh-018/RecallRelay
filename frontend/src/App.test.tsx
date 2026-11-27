@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { App } from './App';
 
@@ -28,5 +28,10 @@ describe('App operator console shell', () => {
     await waitFor(() => {
       expect(screen.getByText('No Active Recall Published')).toBeInTheDocument();
     });
+
+    const toggleBtn = screen.getByRole('button', { name: /Switch to light mode/i });
+    fireEvent.click(toggleBtn);
+    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(screen.getByRole('button', { name: /Switch to dark mode/i })).toBeInTheDocument();
   });
 });

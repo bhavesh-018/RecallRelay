@@ -21,6 +21,7 @@ import {
   setStoredOperatorToken,
 } from '../../api/client';
 import { BrandLogo } from '../../components/BrandLogo';
+import { ThemeToggle } from '../../components/ThemeContext';
 import { AgentWorkbenchView } from './AgentWorkbenchView';
 import { BatchTraceView } from './BatchTraceView';
 import { ExperimentSummaryView } from './ExperimentSummaryView';
@@ -234,6 +235,7 @@ export function OperatorConsole() {
               <ShieldAlert className="h-3.5 w-3.5" />
               <span>Fictional Drill Platform</span>
             </span>
+            <ThemeToggle />
           </div>
         </header>
 

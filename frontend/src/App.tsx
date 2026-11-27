@@ -1,6 +1,7 @@
 import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
 import { BrandLogo } from './components/BrandLogo';
+import { ThemeProvider, ThemeToggle } from './components/ThemeContext';
 import { OperatorConsole } from './pages/operator/OperatorConsole';
 import { JoinDrillPage } from './pages/participant/JoinDrillPage';
 import { ParticipantTaskPage } from './pages/participant/ParticipantTaskPage';
@@ -17,10 +18,13 @@ function AppShell() {
             <Link to="/" className="transition-opacity hover:opacity-90">
               <BrandLogo size="sm" showWordmark />
             </Link>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[11px] font-medium text-amber-300">
-              <ShieldAlert className="h-3.5 w-3.5" />
-              Fictional Drill
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[11px] font-medium text-amber-300">
+                <ShieldAlert className="h-3.5 w-3.5" />
+                Fictional Drill
+              </span>
+              <ThemeToggle />
+            </div>
           </div>
         </header>
       )}
@@ -36,9 +40,11 @@ function AppShell() {
 
 export function App() {
   return (
-    <BrowserRouter>
-      <AppShell />
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <AppShell />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
