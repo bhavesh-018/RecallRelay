@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowLeft, CheckCircle2, Clock, Play, ShieldAlert } from 'lucide-react';
 import {
   ApiError,
   type DrillSessionState,
@@ -26,7 +27,6 @@ export function JoinDrillPage() {
   const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number>(300);
 
-  // Live 1s countdown synced to server remaining_seconds while active
   useEffect(() => {
     if (!session || session.outcome === 'success') return;
     setCountdown(Math.ceil(session.remaining_seconds));
@@ -36,7 +36,6 @@ export function JoinDrillPage() {
     return () => window.clearInterval(timer);
   }, [session?.session_id, session?.remaining_seconds, session?.outcome]);
 
-  // Acknowledge workflow render once variant is assigned
   useEffect(() => {
     if (!session || !session.variant || session.started_at) return;
     void acknowledgeSessionRendered(session.scoped_token).catch(() => {
@@ -76,16 +75,19 @@ export function JoinDrillPage() {
 
   if (!session) {
     return (
-      <main className="mx-auto max-w-md px-4 py-8 space-y-4">
-        <div className="rounded-md border border-[#27272A] bg-[#18181B] px-3.5 py-2 text-xs font-medium text-[#EDEDED]">
-          Fictional recall drill
+      <main className="mx-auto max-w-md px-4 py-10 space-y-4">
+        <div className="inline-flex w-full items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300">
+          <ShieldAlert className="h-4 w-4 shrink-0" />
+          <span>Fictional recall drill</span>
         </div>
 
-        <div className="rr-panel-enter rounded-lg border border-[#27272A] bg-[#18181B] p-5 space-y-4">
-          <div className="space-y-1.5">
-            <h1 className="text-base font-semibold text-[#EDEDED]">Remote Shop Recall Drill</h1>
+        <div className="rr-panel-enter rr-surface rounded-xl p-6 space-y-5">
+          <div className="space-y-2">
+            <h1 className="text-lg font-semibold tracking-tight text-[#F4F4F5]">
+              Remote Shop Recall Drill
+            </h1>
             <p className="text-xs leading-relaxed text-[#A1A1AA]">
-              No login required. Press Start to receive your mock shop inventory card for Batch B17. You have 5 minutes to count Sold, Remaining, and Set Aside units accurately.
+              No login required. Press Start to receive your isolated mock shop inventory card for Batch B17. You have <span className="font-mono text-[#F4F4F5]">5:00</span> to reconcile Sold, Remaining, and Set Aside units accurately.
             </p>
           </div>
 
@@ -93,42 +95,70 @@ export function JoinDrillPage() {
             type="button"
             disabled={starting}
             onClick={() => void handleStartDrill()}
-            className="w-full rounded-md bg-[#3B82F6] py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#3B82F6] py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
+            <Play className="h-4 w-4" />
             {starting ? 'Starting Drill…' : 'Start Isolated Shop Drill'}
           </button>
 
           {error && (
-            <div role="alert" className="rounded border border-red-900/60 bg-red-950/30 p-2.5 text-xs text-red-400">
+            <div role="alert" className="rounded-lg border border-red-900/60 bg-red-950/30 p-3 text-xs text-red-400">
               {error}
             </div>
           )}
 
-          <Link to="/" className="inline-block text-xs text-[#3B82F6] hover:underline">
-            ← Back to Operator Console
-          </Link>
+          <div className="border-t border-[#27272A] pt-3">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-xs text-[#A1A1AA] transition-colors hover:text-[#F4F4F5]"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to Operator Console
+            </Link>
+          </div>
         </div>
       </main>
     );
   }
 
   if (session.outcome === 'success' || session.late_completion_recorded) {
+    const qualified = session.outcome === 'success';
     return (
-      <main className="mx-auto max-w-md px-4 py-8 space-y-4">
-        <div className="rounded-md border border-[#27272A] bg-[#18181B] px-3.5 py-2 text-xs font-medium text-[#EDEDED]">
-          {session.banner}
+      <main className="mx-auto max-w-md px-4 py-10 space-y-4">
+        <div className="inline-flex w-full items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300">
+          <ShieldAlert className="h-4 w-4 shrink-0" />
+          <span>{session.banner}</span>
         </div>
-        <div className="rr-panel-enter rounded-lg border border-[#27272A] bg-[#18181B] p-5 space-y-3">
-          <div className={`font-mono text-xs ${session.outcome === 'success' ? 'text-emerald-400' : 'text-amber-300'}`}>
-            {session.outcome === 'success'
-              ? '✓ Verified Drill Completion (Within 5 Minutes)'
-              : 'Recorded After 5-Minute Cutoff (Primary Metric: Timeout)'}
+        <div className="rr-panel-enter rr-surface rounded-xl p-6 space-y-4">
+          <div
+            className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 font-mono text-xs ${
+              qualified
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                : 'border-amber-500/30 bg-amber-500/10 text-amber-300'
+            }`}
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            {qualified
+              ? 'Verified Drill Completion (<= 5 min)'
+              : 'Recorded After 5-Minute Cutoff (Timeout)'}
           </div>
-          <h1 className="text-base font-semibold text-[#EDEDED]">Thank You · Drill Complete</h1>
-          <p className="font-mono text-xs text-[#A1A1AA]">
-            Alias: {session.participant_alias} · Variant: {session.variant} · Time:{' '}
-            {session.completed_seconds !== null ? `${session.completed_seconds}s` : '—'}
-          </p>
+          <h1 className="text-lg font-semibold text-[#F4F4F5]">Thank You · Drill Complete</h1>
+          <div className="grid grid-cols-3 gap-2 rounded-lg border border-[#27272A] bg-[#09090B] p-3 font-mono text-xs">
+            <div>
+              <div className="text-[10px] text-[#71717A]">Alias</div>
+              <div className="mt-0.5 text-[#F4F4F5]">{session.participant_alias}</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-[#71717A]">Variant</div>
+              <div className="mt-0.5 text-[#60A5FA]">{session.variant}</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-[#71717A]">Duration</div>
+              <div className="mt-0.5 text-[#F4F4F5]">
+                {session.completed_seconds !== null ? `${session.completed_seconds}s` : '—'}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     );
@@ -136,9 +166,16 @@ export function JoinDrillPage() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-6 space-y-3">
-      <div className="flex items-center justify-between rounded-md border border-[#27272A] bg-[#18181B] px-3.5 py-2 font-mono text-xs">
-        <span className="text-[#A1A1AA]">Alias {session.participant_alias}</span>
-        <span className={countdown <= 30 ? 'text-amber-300' : 'text-[#EDEDED]'}>
+      <div className="rr-surface flex items-center justify-between rounded-lg px-3.5 py-2.5 font-mono text-xs">
+        <span className="text-[#A1A1AA]">
+          Alias <span className="text-[#F4F4F5]">{session.participant_alias}</span>
+        </span>
+        <span
+          className={`inline-flex items-center gap-1.5 font-semibold ${
+            countdown <= 30 ? 'text-amber-300' : 'text-[#F4F4F5]'
+          }`}
+        >
+          <Clock className="h-3.5 w-3.5 text-[#60A5FA]" />
           {formatClock(countdown)} remaining
         </span>
       </div>

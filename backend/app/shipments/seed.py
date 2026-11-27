@@ -10,7 +10,7 @@ from typing import Any
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from app.models.domain import Location, ProductBatch, Shipment
+from app.models.domain import Location, ProductBatch, Recall, RecallTask, Response, Shipment
 from app.reconciliation.accounting import validate_shipment_transfer
 
 
@@ -30,13 +30,13 @@ def load_fixture_into_db(
     dataset_key = str(payload.get("dataset_key") or path.stem)
 
     if reset_dataset:
-        batch_ids = list(
-            db.scalars(select(ProductBatch.id).where(ProductBatch.dataset_key == dataset_key)).all()
-        )
-        if batch_ids:
-            db.execute(delete(Shipment).where(Shipment.batch_id.in_(batch_ids)))
-            db.execute(delete(ProductBatch).where(ProductBatch.id.in_(batch_ids)))
-        db.execute(delete(Location).where(Location.dataset_key == dataset_key))
+        # Clear supply-chain fixture tables cleanly when switching datasets while preserving DrillSession/EventOutbox
+        db.execute(delete(Response))
+        db.execute(delete(RecallTask))
+        db.execute(delete(Recall))
+        db.execute(delete(Shipment))
+        db.execute(delete(ProductBatch))
+        db.execute(delete(Location))
         db.flush()
 
     loc_count = 0
