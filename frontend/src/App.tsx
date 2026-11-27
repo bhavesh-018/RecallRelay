@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
 import { BrandLogo } from './components/BrandLogo';
 import { ThemeProvider, ThemeToggle } from './components/ThemeContext';
@@ -15,9 +15,9 @@ function AppShell() {
       {isParticipantRoute && (
         <header className="sticky top-0 z-30 border-b border-[#222228] bg-[#09090B]/90 backdrop-blur-xl">
           <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
-            <Link to="/" className="transition-opacity hover:opacity-90">
+            <div className="select-none">
               <BrandLogo size="sm" showWordmark />
-            </Link>
+            </div>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[11px] font-medium text-amber-300">
                 <ShieldAlert className="h-3.5 w-3.5" />
