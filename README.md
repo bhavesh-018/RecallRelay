@@ -4,6 +4,13 @@
 
 RecallRelay models a multi-tier supply-chain batch recall across a manufacturer, distributors, and retail locations. Operators trace affected batches without double-counting stock transfers, publish idempotent recall tasks with QR mobile response links, run a live **Flagsmith A/B experiment** comparing two participant reconciliation workflows, and review bounded AI-agent proposals that safely update Flagsmith `Pilot` flag weights only after deterministic validation and human approval.
 
+### Judge & Reviewer Quick Links
+- **Experiment Protocol (Track 1):** [reports/experiment_protocol.md](reports/experiment_protocol.md)
+- **Live Agent Evidence & 9/9 Eval Suite (Track 2):** [reports/agent_evidence.md](reports/agent_evidence.md)
+- **Task & Delivery Tracker:** [tasks.md](tasks.md)
+- **Architectural Decisions (ADR-001–ADR-009):** [decision_log.md](decision_log.md)
+- **License:** [LICENSE](LICENSE) (MIT)
+
 ---
 
 ## Technical Coverage Across All 3 Tracks
