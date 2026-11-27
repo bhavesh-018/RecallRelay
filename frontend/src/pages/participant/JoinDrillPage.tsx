@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Clock, Play, ShieldAlert } from 'lucide-react';
+import { CheckCircle2, Clock, Play, ShieldAlert } from 'lucide-react';
 import {
   ApiError,
   type DrillSessionState,
@@ -108,16 +107,6 @@ export function JoinDrillPage() {
               {error}
             </div>
           )}
-
-          <div className="border-t border-[#27272A] pt-3">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 text-xs text-[#A1A1AA] transition-colors hover:text-[#F4F4F5]"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              Back to Operator Console
-            </Link>
-          </div>
         </div>
       </main>
     );
