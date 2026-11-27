@@ -303,17 +303,41 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
                 </div>
 
                 {isChange && proposedWeights && (
-                  <div className="grid grid-cols-1 gap-3 border-t border-[#27272A] pt-3 sm:grid-cols-2">
-                    <div className="space-y-1">
-                      <div className="text-[11px] text-[#71717A]">Current Pilot Split</div>
-                      <div className="font-mono text-xs text-[#A1A1AA]">
-                        standard {currentWeights?.standard ?? 50}% / guided {currentWeights?.guided ?? 50}%
+                  <div className="grid grid-cols-1 gap-4 border-t border-[#222228] pt-3 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="text-[#71717A]">Current Pilot Split</span>
+                        <span className="font-mono text-[#A1A1AA]">
+                          {currentWeights?.standard ?? 50}% std / {currentWeights?.guided ?? 50}% gdd
+                        </span>
+                      </div>
+                      <div className="flex h-2 w-full overflow-hidden rounded-full bg-[#18181D]">
+                        <div
+                          className="bg-[#52525B]"
+                          style={{ width: `${currentWeights?.standard ?? 50}%` }}
+                        />
+                        <div
+                          className="bg-[#3B82F6]/60"
+                          style={{ width: `${currentWeights?.guided ?? 50}%` }}
+                        />
                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <div className="text-[11px] text-[#60A5FA]">Proposed Pilot Split</div>
-                      <div className="font-mono text-xs font-semibold text-[#F4F4F5]">
-                        standard {proposedWeights.standard ?? 0}% / guided {proposedWeights.guided ?? 100}%
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-medium text-[#60A5FA]">Proposed Pilot Split</span>
+                        <span className="font-mono font-semibold text-[#F4F4F5]">
+                          {proposedWeights.standard ?? 0}% std / {proposedWeights.guided ?? 100}% gdd
+                        </span>
+                      </div>
+                      <div className="flex h-2 w-full overflow-hidden rounded-full bg-[#18181D]">
+                        <div
+                          className="bg-[#71717A]"
+                          style={{ width: `${proposedWeights.standard ?? 0}%` }}
+                        />
+                        <div
+                          className="bg-[#3B82F6]"
+                          style={{ width: `${proposedWeights.guided ?? 100}%` }}
+                        />
                       </div>
                     </div>
                   </div>

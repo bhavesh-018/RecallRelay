@@ -1,43 +1,82 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
 :root {
   color-scheme: dark;
   --rr-bg-canvas: #09090b;
-  --rr-bg-rail: #0d0d10;
-  --rr-bg-surface: #141417;
-  --rr-bg-elevated: #1c1c21;
-  --rr-border: #27272a;
-  --rr-border-subtle: #1f1f23;
+  --rr-bg-sidebar: #0b0b0e;
+  --rr-bg-surface: #111114;
+  --rr-bg-elevated: #18181d;
+  --rr-border: #222228;
+  --rr-border-strong: #32323c;
   --rr-text-primary: #f4f4f5;
   --rr-text-secondary: #a1a1aa;
   --rr-text-muted: #71717a;
   --rr-accent: #3b82f6;
 }
 
+html,
 body {
   background-color: var(--rr-bg-canvas);
   color: var(--rr-text-primary);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Subtle enterprise card elevation with crisp hairline top sheen */
 .rr-surface {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%), #141417;
-  border: 1px solid #27272a;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.03);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0) 48%), #111114;
+  border: 1px solid #222228;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+    0 1px 2px 0 rgba(0, 0, 0, 0.45);
 }
 
+.rr-surface-interactive {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0) 48%), #111114;
+  border: 1px solid #222228;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+    0 1px 2px 0 rgba(0, 0, 0, 0.45);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.rr-surface-interactive:hover {
+  border-color: #32323c;
+}
+
+/* Architectural dot grid for supply-chain topology canvas */
 .rr-dot-grid {
-  background-color: #0b0b0e;
-  background-image: radial-gradient(rgba(161, 161, 170, 0.14) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background-color: #09090c;
+  background-image: radial-gradient(rgba(161, 161, 170, 0.16) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Subtle dark scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }
 
 @keyframes rrPanelFade {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(5px);
   }
   to {
     opacity: 1;
@@ -47,6 +86,21 @@ body {
 
 .rr-panel-enter {
   animation: rrPanelFade 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes rrSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.rr-drawer-enter {
+  animation: rrSlideRight 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes rrStepSlide {
