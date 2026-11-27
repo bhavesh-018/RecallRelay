@@ -77,6 +77,7 @@ export function OperatorOverview({
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'reconciled' | 'discrepancy'>('all');
 
   const [auditTaskId, setAuditTaskId] = useState<string | null>(null);
+  const [auditLocationName, setAuditLocationName] = useState<string>('');
   const [auditEvents, setAuditEvents] = useState<AuditEventItem[]>([]);
   const [auditError, setAuditError] = useState<string | null>(null);
 
@@ -138,8 +139,9 @@ export function OperatorOverview({
     });
   }, [overview, searchQuery, roleFilter, statusFilter]);
 
-  async function handleInspectAudit(taskId: string) {
+  async function handleInspectAudit(taskId: string, locationName: string) {
     setAuditTaskId(taskId);
+    setAuditLocationName(locationName);
     setAuditError(null);
     if (!operatorAuthenticated) {
       setAuditEvents([]);
@@ -182,7 +184,7 @@ export function OperatorOverview({
 
   if (loading && !overview) {
     return (
-      <div className="rr-surface rounded-xl p-6 text-xs text-[#A1A1AA]">
+      <div className="rr-surface rounded-xl p-8 text-xs text-[#A1A1AA]">
         Loading active recall overview…
       </div>
     );
@@ -190,7 +192,7 @@ export function OperatorOverview({
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-900/60 bg-[#141417] p-5 text-xs text-red-400">
+      <div className="rounded-xl border border-red-900/60 bg-[#111114] p-5 text-xs text-red-400">
         {error}
       </div>
     );
@@ -198,14 +200,14 @@ export function OperatorOverview({
 
   if (!overview) {
     return (
-      <div className="rr-panel-enter rr-surface rounded-xl px-8 py-12 text-center space-y-4">
+      <div className="rr-panel-enter rr-surface rounded-2xl px-8 py-16 text-center space-y-5">
         <div className="flex justify-center">
           <BrandLogo size="lg" />
         </div>
-        <div className="space-y-1.5">
-          <div className="text-base font-semibold tracking-tight text-[#F4F4F5]">
+        <div className="space-y-2">
+          <h1 className="text-xl font-semibold tracking-[-0.02em] text-[#F4F4F5]">
             No Active Recall Published
-          </div>
+          </h1>
           <p className="mx-auto max-w-md text-xs leading-relaxed text-[#A1A1AA]">
             Publish a fictional drill notice for an affected batch to generate scoped participant reconciliation tasks across all reached supply-chain locations.
           </p>
@@ -214,7 +216,7 @@ export function OperatorOverview({
           <button
             type="button"
             onClick={onNavigatePublish}
-            className="rounded-lg bg-[#3B82F6] px-4 py-2 text-xs font-medium text-white transition-opacity hover:opacity-90"
+            className="rounded-lg bg-[#3B82F6] px-5 py-2.5 text-xs font-medium text-white shadow-sm transition-opacity hover:opacity-90"
           >
             Publish Drill Notice
           </button>
@@ -226,25 +228,36 @@ export function OperatorOverview({
   const pctComplete =
     overview.total_tasks > 0 ? Math.round((overview.completed_tasks / overview.total_tasks) * 100) : 0;
 
+  const opening = Math.max(overview.trace.opening_quantity, 1);
+  const quarantinedPct = Math.min(100, (overview.trace.total_set_aside / opening) * 100);
+  const unquarantinedRem = Math.max(0, overview.trace.total_remaining - overview.trace.total_set_aside);
+  const unquarantinedPct = Math.min(100 - quarantinedPct, (unquarantinedRem / opening) * 100);
+  const soldPct = Math.min(100 - quarantinedPct - unquarantinedPct, (overview.trace.total_sold / opening) * 100);
+
   return (
-    <div className="rr-panel-enter space-y-5">
-      {/* Header & Recall Selector */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <div className="rr-panel-enter space-y-6">
+      {/* Page Title & Active Batch Selector */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-semibold tracking-tight text-[#F4F4F5]">
-              Batch {overview.batch_code} · {overview.product_name}
-            </h2>
-            <span className="rounded-md border border-[#27272A] bg-[#141417] px-2 py-0.5 font-mono text-[11px] text-[#A1A1AA]">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h1 className="text-2xl font-semibold tracking-[-0.025em] text-[#F4F4F5]">
+              Batch {overview.batch_code}
+            </h1>
+            <span className="text-lg font-normal text-[#71717A]">·</span>
+            <span className="text-base font-medium text-[#D4D4D8]">{overview.product_name}</span>
+            <span className="rounded-md border border-[#222228] bg-[#141418] px-2 py-0.5 font-mono text-[11px] text-[#A1A1AA]">
               v{overview.notice_version}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] text-emerald-400">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-              Live · {lastUpdated || 'synced'}
-            </span>
           </div>
-          <p className="mt-1 text-xs text-[#A1A1AA]">
-            Batch-level conservation across {overview.total_tasks} reached locations · Zero transfer double-counting
+          <p className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-[#71717A]">
+            <span className="inline-flex items-center gap-1.5 text-emerald-400">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+              Live 5s telemetry
+            </span>
+            <span>·</span>
+            <span>Last sync {lastUpdated || 'just now'}</span>
+            <span>·</span>
+            <span>{overview.total_tasks} supply-chain nodes tracked</span>
           </p>
         </div>
 
@@ -253,7 +266,7 @@ export function OperatorOverview({
             aria-label="Select active recall"
             value={overview.id}
             onChange={(e) => onSelectRecall(e.target.value)}
-            className="rounded-lg border border-[#27272A] bg-[#141417] px-3 py-1.5 font-mono text-xs text-[#F4F4F5] focus:border-[#3B82F6] focus:outline-none"
+            className="rounded-lg border border-[#222228] bg-[#111114] px-3 py-2 font-mono text-xs text-[#F4F4F5] focus:border-[#3B82F6] focus:outline-none"
           >
             {recalls.map((r) => (
               <option key={r.id} value={r.id}>
@@ -264,61 +277,75 @@ export function OperatorOverview({
         )}
       </div>
 
-      {/* KPI Metric Strip */}
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <div className="rr-surface rounded-xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs text-[#A1A1AA]">
-            <span>Opening Batch</span>
+      {/* KPI Metric Grid */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rr-surface-interactive rounded-xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#71717A]">
+              Opening Batch
+            </span>
             <Package className="h-4 w-4 text-[#60A5FA]" />
           </div>
-          <div className="font-mono text-2xl font-semibold tabular-nums text-[#F4F4F5]">
+          <div className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-[#F4F4F5]">
             {overview.trace.opening_quantity}
           </div>
-          <div className="text-[11px] text-[#71717A]">
-            Accounted: <span className="font-mono text-[#A1A1AA]">{overview.trace.accounted_total} units</span>
+          <div className="text-xs text-[#71717A]">
+            Accounted:{' '}
+            <span className="font-mono font-medium text-[#D4D4D8]">{overview.trace.accounted_total} units</span>
           </div>
         </div>
 
-        <div className="rr-surface rounded-xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs text-[#A1A1AA]">
-            <span>Remaining Stock</span>
+        <div className="rr-surface-interactive rounded-xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#71717A]">
+              Remaining Stock
+            </span>
             <Warehouse className="h-4 w-4 text-amber-400" />
           </div>
-          <div className="font-mono text-2xl font-semibold tabular-nums text-[#F4F4F5]">
+          <div className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-[#F4F4F5]">
             {overview.trace.total_remaining}
           </div>
-          <div className="text-[11px] text-[#71717A]">
-            Quarantined: <span className="font-mono text-emerald-400">{overview.trace.total_set_aside} set aside</span>
+          <div className="text-xs text-[#71717A]">
+            Quarantined:{' '}
+            <span className="font-mono font-medium text-emerald-400">{overview.trace.total_set_aside} set aside</span>
           </div>
         </div>
 
-        <div className="rr-surface rounded-xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs text-[#A1A1AA]">
-            <span>Sold Downstream</span>
+        <div className="rr-surface-interactive rounded-xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#71717A]">
+              Sold Downstream
+            </span>
             <ShoppingBag className="h-4 w-4 text-violet-400" />
           </div>
-          <div className="font-mono text-2xl font-semibold tabular-nums text-[#F4F4F5]">
+          <div className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-[#F4F4F5]">
             {overview.trace.total_sold}
           </div>
-          <div className="text-[11px] text-[#71717A]">
+          <div className="text-xs text-[#71717A]">
             Discrepancy:{' '}
-            <span className={`font-mono ${overview.trace.discrepancy > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+            <span
+              className={`font-mono font-medium ${
+                overview.trace.discrepancy > 0 ? 'text-red-400' : 'text-emerald-400'
+              }`}
+            >
               {overview.trace.discrepancy}
             </span>
           </div>
         </div>
 
-        <div className="rr-surface rounded-xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs text-[#A1A1AA]">
-            <span>Tasks Reconciled</span>
+        <div className="rr-surface-interactive rounded-xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#71717A]">
+              Tasks Reconciled
+            </span>
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-mono text-2xl font-semibold tabular-nums text-[#F4F4F5]">
+            <span className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-[#F4F4F5]">
               {overview.completed_tasks}
-              <span className="text-sm font-normal text-[#71717A]"> / {overview.total_tasks}</span>
+              <span className="text-base font-normal text-[#71717A]"> / {overview.total_tasks}</span>
             </span>
-            <span className="font-mono text-xs text-[#60A5FA]">{pctComplete}%</span>
+            <span className="font-mono text-xs font-medium text-[#60A5FA]">{pctComplete}%</span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#09090B]">
             <div
@@ -329,16 +356,42 @@ export function OperatorOverview({
         </div>
       </div>
 
-      {/* Filter & Search Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5">
-        <div className="relative min-w-[200px] flex-1 max-w-xs">
-          <Search className="pointer-events-none absolute left-2.5 top-2 h-3.5 w-3.5 text-[#71717A]" />
+      {/* Segmented Batch Conservation Bar */}
+      <div className="rr-surface rounded-xl p-4 space-y-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span className="font-medium text-[#F4F4F5]">Batch Unit Conservation</span>
+          <div className="flex flex-wrap items-center gap-4 font-mono text-[11px] text-[#A1A1AA]">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              Quarantined ({overview.trace.total_set_aside})
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-amber-400" />
+              Pending Quarantine ({unquarantinedRem})
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-violet-500" />
+              Sold ({overview.trace.total_sold})
+            </span>
+          </div>
+        </div>
+        <div className="flex h-2 w-full overflow-hidden rounded-full bg-[#09090B]">
+          <div className="bg-emerald-500 transition-all duration-300" style={{ width: `${quarantinedPct}%` }} />
+          <div className="bg-amber-400/80 transition-all duration-300" style={{ width: `${unquarantinedPct}%` }} />
+          <div className="bg-violet-500 transition-all duration-300" style={{ width: `${soldPct}%` }} />
+        </div>
+      </div>
+
+      {/* Search & Filter Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="relative min-w-[220px] flex-1 max-w-sm">
+          <Search className="pointer-events-none absolute left-3 top-2.5 h-3.5 w-3.5 text-[#52525B]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Filter locations…"
-            className="w-full rounded-lg border border-[#27272A] bg-[#141417] py-1.5 pl-8 pr-3 text-xs text-[#F4F4F5] placeholder:text-[#52525B] focus:border-[#3B82F6] focus:outline-none"
+            placeholder="Search locations or hubs…"
+            className="w-full rounded-lg border border-[#222228] bg-[#111114] py-2 pl-9 pr-3 text-xs text-[#F4F4F5] placeholder:text-[#52525B] focus:border-[#3B82F6] focus:outline-none"
           />
         </div>
 
@@ -348,25 +401,25 @@ export function OperatorOverview({
               key={r}
               type="button"
               onClick={() => setRoleFilter(r)}
-              className={`rounded-md border px-2.5 py-1 text-[11px] font-medium capitalize transition-colors ${
+              className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-medium capitalize transition-colors ${
                 roleFilter === r
                   ? 'border-[#3B82F6]/50 bg-[#3B82F6]/15 text-[#60A5FA]'
-                  : 'border-[#27272A] bg-[#141417] text-[#A1A1AA] hover:text-[#F4F4F5]'
+                  : 'border-[#222228] bg-[#111114] text-[#A1A1AA] hover:text-[#F4F4F5]'
               }`}
             >
-              {r === 'all' ? 'All Roles' : r}
+              {r === 'all' ? 'All Tiers' : r}
             </button>
           ))}
-          <span className="mx-1 h-4 w-px bg-[#27272A]" />
+          <span className="mx-1 h-4 w-px bg-[#222228]" />
           {(['all', 'pending', 'reconciled', 'discrepancy'] as const).map((st) => (
             <button
               key={st}
               type="button"
               onClick={() => setStatusFilter(st)}
-              className={`rounded-md border px-2.5 py-1 text-[11px] font-medium capitalize transition-colors ${
+              className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-medium capitalize transition-colors ${
                 statusFilter === st
                   ? 'border-[#3B82F6]/50 bg-[#3B82F6]/15 text-[#60A5FA]'
-                  : 'border-[#27272A] bg-[#141417] text-[#A1A1AA] hover:text-[#F4F4F5]'
+                  : 'border-[#222228] bg-[#111114] text-[#A1A1AA] hover:text-[#F4F4F5]'
               }`}
             >
               {st === 'all' ? 'All Status' : st}
@@ -380,22 +433,22 @@ export function OperatorOverview({
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs">
             <thead>
-              <tr className="border-b border-[#27272A] bg-[#0D0D10] text-[11px] uppercase tracking-wider text-[#71717A]">
-                <th className="px-4 py-3 font-medium">Location ({filteredTasks.length})</th>
-                <th className="px-2.5 py-3 text-right font-medium">Recv</th>
-                <th className="px-2.5 py-3 text-right font-medium">Fwd</th>
-                <th className="px-2.5 py-3 text-right font-medium">Sold</th>
-                <th className="px-2.5 py-3 text-right font-medium">Rem</th>
-                <th className="px-2.5 py-3 text-right font-medium">Aside</th>
-                <th className="px-3 py-3 text-right font-medium">Status</th>
-                <th className="px-4 py-3 text-right font-medium">Actions</th>
+              <tr className="border-b border-[#222228] bg-[#0B0B0E] text-[10px] font-semibold uppercase tracking-[0.07em] text-[#71717A]">
+                <th className="px-5 py-3">Location ({filteredTasks.length})</th>
+                <th className="px-3 py-3 text-right">Recv</th>
+                <th className="px-3 py-3 text-right">Fwd</th>
+                <th className="px-3 py-3 text-right">Sold</th>
+                <th className="px-3 py-3 text-right">Rem</th>
+                <th className="px-3 py-3 text-right">Aside</th>
+                <th className="px-4 py-3 text-right">Status</th>
+                <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#27272A]/70 font-mono tabular-nums">
+            <tbody className="divide-y divide-[#1E1E24] font-mono tabular-nums">
               {filteredTasks.map((task) => (
-                <tr key={task.task_id} className="transition-colors hover:bg-[#1C1C21]/70">
-                  <td className="px-4 py-3 font-sans">
-                    <div className="flex items-center gap-2">
+                <tr key={task.task_id} className="transition-colors hover:bg-[#18181E]/75">
+                  <td className="px-5 py-3.5 font-sans">
+                    <div className="flex items-center gap-2.5">
                       <span className="font-medium text-[#F4F4F5]">{task.location_name}</span>
                       <span
                         className={`rounded border px-1.5 py-0.5 text-[10px] font-medium capitalize ${roleBadgeClasses(task.role)}`}
@@ -404,29 +457,29 @@ export function OperatorOverview({
                       </span>
                     </div>
                   </td>
-                  <td className="px-2.5 py-3 text-right text-[#F4F4F5]">{task.received}</td>
-                  <td className="px-2.5 py-3 text-right text-[#A1A1AA]">{task.forwarded}</td>
-                  <td className="px-2.5 py-3 text-right text-[#A1A1AA]">
+                  <td className="px-3 py-3.5 text-right text-[#F4F4F5]">{task.received}</td>
+                  <td className="px-3 py-3.5 text-right text-[#A1A1AA]">{task.forwarded}</td>
+                  <td className="px-3 py-3.5 text-right text-[#A1A1AA]">
                     {task.response ? task.response.sold_qty : '—'}
                   </td>
-                  <td className="px-2.5 py-3 text-right text-[#A1A1AA]">
+                  <td className="px-3 py-3.5 text-right text-[#A1A1AA]">
                     {task.response ? task.response.remaining_qty : '—'}
                   </td>
-                  <td className="px-2.5 py-3 text-right text-emerald-400">
+                  <td className="px-3 py-3.5 text-right text-emerald-400">
                     {task.response ? task.response.set_aside_qty : '—'}
                   </td>
-                  <td className="px-3 py-3 text-right font-sans">
+                  <td className="px-4 py-3.5 text-right font-sans">
                     <span
                       className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${statusPillClasses(task.status)}`}
                     >
                       {task.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-sans">
-                    <div className="inline-flex items-center gap-1">
+                  <td className="px-5 py-3.5 text-right font-sans">
+                    <div className="inline-flex items-center gap-1.5">
                       <Link
                         to={`/t/${task.access_token}`}
-                        className="inline-flex items-center gap-1 rounded-md border border-[#27272A] bg-[#09090B] px-2 py-1 text-[11px] font-medium text-[#F4F4F5] transition-colors hover:border-[#3B82F6] hover:text-[#60A5FA]"
+                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2.5 py-1 text-[11px] font-medium text-[#F4F4F5] transition-colors hover:border-[#3B82F6] hover:text-[#60A5FA]"
                       >
                         <ExternalLink className="h-3 w-3" />
                         Open
@@ -434,7 +487,7 @@ export function OperatorOverview({
                       <button
                         type="button"
                         onClick={() => handleCopyLink(task.task_id, task.access_token)}
-                        className="inline-flex items-center gap-1 rounded-md border border-[#27272A] bg-[#09090B] px-2 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#3F3F46] hover:text-[#F4F4F5]"
+                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
                       >
                         {copiedTaskId === task.task_id ? (
                           <Check className="h-3 w-3 text-emerald-400" />
@@ -446,15 +499,15 @@ export function OperatorOverview({
                       <button
                         type="button"
                         onClick={() => void handleShowQr(task.task_id)}
-                        className="inline-flex items-center gap-1 rounded-md border border-[#27272A] bg-[#09090B] px-2 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#3F3F46] hover:text-[#F4F4F5]"
+                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
                       >
                         <QrCode className="h-3 w-3" />
                         QR
                       </button>
                       <button
                         type="button"
-                        onClick={() => void handleInspectAudit(task.task_id)}
-                        className="inline-flex items-center gap-1 rounded-md border border-[#27272A] bg-[#09090B] px-2 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#3F3F46] hover:text-[#F4F4F5]"
+                        onClick={() => void handleInspectAudit(task.task_id, task.location_name)}
+                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
                       >
                         <ClipboardList className="h-3 w-3" />
                         Audit
@@ -465,7 +518,7 @@ export function OperatorOverview({
               ))}
               {filteredTasks.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center font-sans text-xs text-[#71717A]">
+                  <td colSpan={8} className="px-5 py-10 text-center font-sans text-xs text-[#71717A]">
                     No locations match the current filter.
                   </td>
                 </tr>
@@ -475,96 +528,143 @@ export function OperatorOverview({
         </div>
       </div>
 
-      {/* QR Label Preview Panel */}
+      {/* Centered Print-Ready QR Label Modal */}
       {(qrPayload || qrError) && (
-        <div className="rr-panel-enter rr-surface rounded-xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#F4F4F5]">
-              <QrCode className="h-4 w-4 text-[#60A5FA]" />
-              Printable Box QR Label {qrPayload ? `· ${qrPayload.location_name}` : ''}
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          onClick={() => {
+            setQrPayload(null);
+            setQrError(null);
+          }}
+        >
+          <div
+            className="rr-panel-enter rr-surface w-full max-w-md rounded-2xl p-6 space-y-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#F4F4F5]">
+                <QrCode className="h-4 w-4 text-[#60A5FA]" />
+                Printable Box QR Label
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setQrPayload(null);
+                  setQrError(null);
+                }}
+                className="rounded-lg p-1 text-[#A1A1AA] hover:bg-[#1E1E24] hover:text-[#F4F4F5]"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setQrPayload(null);
-                setQrError(null);
-              }}
-              className="rounded p-1 text-[#A1A1AA] hover:bg-[#27272A] hover:text-[#F4F4F5]"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
-          {qrError ? (
-            <div className="text-xs text-amber-300">{qrError}</div>
-          ) : (
-            qrPayload && (
-              <div className="flex flex-wrap items-center gap-4">
-                <img
-                  src={qrPayload.qr_data_url}
-                  alt={`QR code for ${qrPayload.location_name}`}
-                  className="h-32 w-32 rounded-lg border border-[#27272A] bg-white p-1.5"
-                />
-                <div className="min-w-0 flex-1 space-y-2 text-xs">
-                  <div className="font-medium text-[#F4F4F5]">{qrPayload.banner}</div>
-                  <div className="break-all font-mono text-[11px] text-[#A1A1AA]">{qrPayload.target_url}</div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <a
-                      href={qrPayload.qr_data_url}
-                      download={`recallrelay-qr-${qrPayload.location_name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-[#27272A] bg-[#09090B] px-2.5 py-1 text-xs text-[#F4F4F5] hover:border-[#3B82F6]"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      Download PNG
-                    </a>
+
+            {qrError ? (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300">
+                {qrError}
+              </div>
+            ) : (
+              qrPayload && (
+                <div className="space-y-4">
+                  <div className="flex flex-col items-center rounded-xl border border-[#222228] bg-[#09090B] p-5 text-center space-y-3">
+                    <img
+                      src={qrPayload.qr_data_url}
+                      alt={`QR code for ${qrPayload.location_name}`}
+                      className="h-44 w-44 rounded-lg bg-white p-2 shadow"
+                    />
+                    <div>
+                      <div className="text-sm font-semibold text-[#F4F4F5]">{qrPayload.location_name}</div>
+                      <div className="mt-0.5 text-[11px] text-[#71717A]">{qrPayload.banner}</div>
+                    </div>
                   </div>
+
+                  <div className="rounded-lg border border-[#222228] bg-[#09090B] px-3 py-2 font-mono text-[11px] break-all text-[#A1A1AA]">
+                    {qrPayload.target_url}
+                  </div>
+
                   {qrPayload.is_localhost_warning && (
-                    <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-300">
+                    <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-300">
                       Localhost URL detected: open the console via your cloudflared HTTPS URL before scanning from a phone.
                     </div>
                   )}
+
+                  <div className="flex justify-end gap-2">
+                    <a
+                      href={qrPayload.qr_data_url}
+                      download={`recallrelay-qr-${qrPayload.location_name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#3B82F6] px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Download PNG Label
+                    </a>
+                  </div>
                 </div>
-              </div>
-            )
-          )}
+              )
+            )}
+          </div>
         </div>
       )}
 
-      {/* Audit Drawer */}
+      {/* Right-Hand Slide-Over Audit Inspector Drawer */}
       {auditTaskId && (
-        <div className="rr-panel-enter rr-surface rounded-xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#F4F4F5]">
-              <ClipboardList className="h-4 w-4 text-[#60A5FA]" />
-              Task Audit Trail · <span className="font-mono text-[#A1A1AA]">{auditTaskId}</span>
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs"
+          onClick={() => setAuditTaskId(null)}
+        >
+          <div
+            className="rr-drawer-enter flex h-full w-full max-w-md flex-col border-l border-[#222228] bg-[#0B0B0E] shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-[#1E1E24] px-5 py-4">
+              <div>
+                <div className="flex items-center gap-2 text-sm font-semibold text-[#F4F4F5]">
+                  <ClipboardList className="h-4 w-4 text-[#60A5FA]" />
+                  Audit Timeline
+                </div>
+                <div className="mt-0.5 font-mono text-[11px] text-[#71717A]">
+                  {auditLocationName} · {auditTaskId}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAuditTaskId(null)}
+                className="rounded-lg p-1.5 text-[#A1A1AA] hover:bg-[#18181E] hover:text-[#F4F4F5]"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setAuditTaskId(null)}
-              className="rounded p-1 text-[#A1A1AA] hover:bg-[#27272A] hover:text-[#F4F4F5]"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
+
+            <div className="flex-1 overflow-y-auto p-5">
+              {auditError ? (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300">
+                  {auditError}
+                </div>
+              ) : auditEvents.length === 0 ? (
+                <div className="py-12 text-center text-xs text-[#71717A]">
+                  No audit events recorded for this task yet.
+                </div>
+              ) : (
+                <ol className="relative space-y-4 border-l border-[#222228] pl-5">
+                  {auditEvents.map((ev) => (
+                    <li key={ev.id} className="relative">
+                      <span className="absolute -left-[25px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-[#0B0B0E] bg-[#3B82F6]" />
+                      <div className="rr-surface rounded-lg p-3 space-y-1.5">
+                        <div className="flex items-center justify-between gap-2 font-mono text-xs">
+                          <span className="font-semibold text-[#F4F4F5]">{ev.action}</span>
+                          <span className="text-[10px] text-[#71717A]">
+                            {new Date(ev.created_at).toLocaleTimeString()}
+                          </span>
+                        </div>
+                        <div className="font-mono text-[11px] text-[#A1A1AA]">
+                          actor: {ev.actor}
+                          {ev.revision_ref !== null ? ` · rev #${ev.revision_ref}` : ''}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
           </div>
-          {auditError ? (
-            <div className="text-xs text-amber-300">{auditError}</div>
-          ) : auditEvents.length === 0 ? (
-            <div className="text-xs text-[#A1A1AA]">No audit events recorded for this task yet.</div>
-          ) : (
-            <ul className="space-y-1.5 font-mono text-xs text-[#A1A1AA]">
-              {auditEvents.map((ev) => (
-                <li
-                  key={ev.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[#27272A] bg-[#09090B] px-3 py-2"
-                >
-                  <span>
-                    <span className="text-[#F4F4F5]">{ev.action}</span>
-                    {ev.revision_ref !== null ? ` (rev ${ev.revision_ref})` : ''} · {ev.actor}
-                  </span>
-                  <span className="text-[#71717A]">{new Date(ev.created_at).toLocaleTimeString()}</span>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       )}
     </div>

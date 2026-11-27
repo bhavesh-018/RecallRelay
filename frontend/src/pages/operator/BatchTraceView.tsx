@@ -6,13 +6,14 @@ import {
   getBatchTrace,
   listBatches,
 } from '../../api/client';
+import { useTheme } from '../../components/ThemeContext';
 
-function nodeStroke(status: string, highlighted: boolean): string {
-  if (highlighted) return '#3B82F6';
-  if (status === 'reconciled') return '#10B981';
-  if (status === 'discrepancy') return '#EF4444';
-  if (status === 'pending_quarantine') return '#F59E0B';
-  return '#2E2E34';
+function nodeStroke(status: string, highlighted: boolean, isLight: boolean): string {
+  if (highlighted) return '#2563EB';
+  if (status === 'reconciled') return '#059669';
+  if (status === 'discrepancy') return '#DC2626';
+  if (status === 'pending_quarantine') return '#D97706';
+  return isLight ? '#CBD5E1' : '#2E2E34';
 }
 
 function nodeDotFill(status: string): string {
@@ -25,6 +26,8 @@ function nodeDotFill(status: string): string {
 const TIER_LABELS = ['TIER 1 · SOURCE', 'TIER 2 · DISTRIBUTION', 'TIER 3 · RETAIL', 'TIER 4 · DOWNSTREAM'];
 
 export function BatchTraceView() {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   const [batches, setBatches] = useState<BatchSummary[]>([]);
   const [selectedCode, setSelectedCode] = useState<string>('');
   const [trace, setTrace] = useState<BatchTraceSummary | null>(null);
@@ -199,7 +202,7 @@ export function BatchTraceView() {
                     <text
                       x={col.x}
                       y={22}
-                      fill="#71717A"
+                      fill={isLight ? '#475569' : '#71717A'}
                       fontSize="10"
                       fontWeight="600"
                       fontFamily="monospace"
@@ -230,7 +233,7 @@ export function BatchTraceView() {
                       <path
                         d={`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`}
                         fill="none"
-                        stroke={isConnected ? '#3B82F6' : '#32323A'}
+                        stroke={isConnected ? '#2563EB' : isLight ? '#94A3B8' : '#32323A'}
                         strokeWidth={isConnected ? '2' : '1.4'}
                       />
                       <rect
@@ -239,15 +242,32 @@ export function BatchTraceView() {
                         width="32"
                         height="20"
                         rx="5"
-                        fill={isConnected ? '#172554' : '#141417'}
-                        stroke={isConnected ? '#3B82F6' : '#27272A'}
+                        fill={
+                          isConnected
+                            ? isLight
+                              ? '#DBEAFE'
+                              : '#172554'
+                            : isLight
+                              ? '#FFFFFF'
+                              : '#141417'
+                        }
+                        stroke={isConnected ? '#2563EB' : isLight ? '#CBD5E1' : '#27272A'}
                       />
                       <text
                         x={mx}
                         y={my + 4}
                         textAnchor="middle"
-                        fill={isConnected ? '#93C5FD' : '#A1A1AA'}
+                        fill={
+                          isConnected
+                            ? isLight
+                              ? '#1D4ED8'
+                              : '#93C5FD'
+                            : isLight
+                              ? '#0F172A'
+                              : '#A1A1AA'
+                        }
                         fontSize="10"
+                        fontWeight={isLight ? '600' : '400'}
                         fontFamily="monospace"
                       >
                         {edge.quantity}
@@ -284,15 +304,23 @@ export function BatchTraceView() {
                         width="204"
                         height="52"
                         rx="8"
-                        fill={isSelected ? '#1C1C24' : '#141417'}
-                        stroke={nodeStroke(node.status, isSelected)}
+                        fill={
+                          isSelected
+                            ? isLight
+                              ? '#EFF6FF'
+                              : '#1C1C24'
+                            : isLight
+                              ? '#FFFFFF'
+                              : '#141417'
+                        }
+                        stroke={nodeStroke(node.status, isSelected, isLight)}
                         strokeWidth={isSelected ? '1.8' : '1.2'}
                       />
                       <circle cx={pos.x + 14} cy={pos.y + 18} r="3.5" fill={nodeDotFill(node.status)} />
                       <text
                         x={pos.x + 25}
                         y={pos.y + 21}
-                        fill="#F4F4F5"
+                        fill={isLight ? '#09090B' : '#F4F4F5'}
                         fontSize="11"
                         fontWeight="600"
                       >
@@ -303,7 +331,7 @@ export function BatchTraceView() {
                       <text
                         x={pos.x + 14}
                         y={pos.y + 39}
-                        fill="#A1A1AA"
+                        fill={isLight ? '#334155' : '#A1A1AA'}
                         fontSize="10"
                         fontFamily="monospace"
                       >
