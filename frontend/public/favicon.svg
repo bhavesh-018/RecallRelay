@@ -1,4 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#3B82F6"/>
-  <text x="16" y="22" text-anchor="middle" fill="#FFFFFF" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700">R</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none">
+  <rect width="36" height="36" rx="9" fill="#0F1117"/>
+  <rect x="0.75" y="0.75" width="34.5" height="34.5" rx="8.25" stroke="#27272A" stroke-width="1.5"/>
+  <!-- Outer relay return arcs -->
+  <path d="M10.5 13.5C12.2 10.2 15.6 8.2 19.5 8.5C24.2 8.9 27.8 12.9 27.5 17.7" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M25.5 22.5C23.8 25.8 20.4 27.8 16.5 27.5C11.8 27.1 8.2 23.1 8.5 18.3" stroke="#60A5FA" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Directional relay arrowheads -->
+  <path d="M24.6 15.6L27.5 18.1L29.5 14.9" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M11.4 20.4L8.5 17.9L6.5 21.1" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Central batch verification core -->
+  <circle cx="18" cy="18" r="3.4" fill="#F4F4F5"/>
+  <circle cx="18" cy="18" r="1.4" fill="#3B82F6"/>
 </svg>

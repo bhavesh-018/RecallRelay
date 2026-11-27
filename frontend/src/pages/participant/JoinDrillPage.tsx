@@ -10,6 +10,7 @@ import {
   submitDrillSession,
 } from '../../api/client';
 import { RecallFlow, type RecallFlowValues } from '../../components/RecallFlow';
+import { BrandLogo } from '../../components/BrandLogo';
 
 const STUDY_TOKEN_STORAGE_KEY = 'rr_study_scoped_token';
 
@@ -82,7 +83,8 @@ export function JoinDrillPage() {
         </div>
 
         <div className="rr-panel-enter rr-surface rounded-xl p-6 space-y-5">
-          <div className="space-y-2">
+          <BrandLogo size="md" showWordmark subtitle="Remote Participant Drill" />
+          <div className="space-y-2 border-t border-[#27272A] pt-4">
             <h1 className="text-lg font-semibold tracking-tight text-[#F4F4F5]">
               Remote Shop Recall Drill
             </h1>
