@@ -5,6 +5,7 @@ import { App } from './App';
 describe('App operator console shell', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    window.history.replaceState({}, '', '/');
   });
 
   it('renders RecallRelay navigation and empty-recall prompt cleanly', async () => {
@@ -19,6 +20,7 @@ describe('App operator console shell', () => {
       return new Response(JSON.stringify({}), { status: 200 });
     });
 
+    window.history.replaceState({}, '', '/console');
     render(<App />);
     expect(screen.getByText('RecallRelay')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Overview' })).toBeInTheDocument();

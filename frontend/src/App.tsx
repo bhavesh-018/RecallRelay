@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
 import { BrandLogo } from './components/BrandLogo';
 import { ThemeProvider, ThemeToggle } from './components/ThemeContext';
+import { HomePage } from './pages/HomePage';
 import { OperatorConsole } from './pages/operator/OperatorConsole';
 import { JoinDrillPage } from './pages/participant/JoinDrillPage';
 import { ParticipantTaskPage } from './pages/participant/ParticipantTaskPage';
@@ -30,7 +31,8 @@ function AppShell() {
       )}
 
       <Routes>
-        <Route path="/" element={<OperatorConsole />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/console" element={<OperatorConsole />} />
         <Route path="/t/:token" element={<ParticipantTaskPage />} />
         <Route path="/join" element={<JoinDrillPage />} />
       </Routes>
