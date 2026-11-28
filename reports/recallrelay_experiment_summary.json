@@ -1,0 +1,35 @@
+{
+  "feature_name": "recall_response_flow",
+  "include_practice": false,
+  "total_sessions": 28,
+  "valid_exposed_n": 27,
+  "excluded_n": 1,
+  "exclusions_by_reason": {
+    "pending": 1
+  },
+  "variants": {
+    "standard": {
+      "exposed_n": 18,
+      "success_n": 14,
+      "timeout_n": 0,
+      "abandoned_n": 4,
+      "conversion_rate_pct": 77.78,
+      "median_completion_seconds": 9.0,
+      "total_incorrect_attempts": 8
+    },
+    "guided": {
+      "exposed_n": 9,
+      "success_n": 8,
+      "timeout_n": 0,
+      "abandoned_n": 1,
+      "conversion_rate_pct": 88.89,
+      "median_completion_seconds": 13.79,
+      "total_incorrect_attempts": 6
+    }
+  },
+  "outbox": {
+    "pending": 0,
+    "dispatched": 107,
+    "failed": 0
+  }
+}
