@@ -147,15 +147,15 @@ export function JoinDrillPage() {
           <h1 className="text-lg font-semibold text-[#F4F4F5]">Thank You · Drill Complete</h1>
           <div className="grid grid-cols-3 gap-2 rounded-lg border border-[#27272A] bg-[#09090B] p-3 font-mono text-xs">
             <div>
-              <div className="text-[10px] text-[#71717A]">Alias</div>
+              <div className="text-[11px] rr-muted">Alias</div>
               <div className="mt-0.5 text-[#F4F4F5]">{session.participant_alias}</div>
             </div>
             <div>
-              <div className="text-[10px] text-[#71717A]">Variant</div>
+              <div className="text-[11px] rr-muted">Variant</div>
               <div className="mt-0.5 text-[#60A5FA]">{session.variant}</div>
             </div>
             <div>
-              <div className="text-[10px] text-[#71717A]">Duration</div>
+              <div className="text-[11px] rr-muted">Duration</div>
               <div className="mt-0.5 text-[#F4F4F5]">
                 {session.completed_seconds !== null ? `${session.completed_seconds}s` : '—'}
               </div>

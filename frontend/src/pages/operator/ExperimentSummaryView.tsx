@@ -84,7 +84,7 @@ export function ExperimentSummaryView({ operatorAuthenticated }: ExperimentSumma
             <h2 className="text-lg font-semibold tracking-tight text-[#F4F4F5]">
               Flagsmith A/B Experiment
             </h2>
-            <span className="rounded-md border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-2 py-0.5 font-mono text-[11px] text-[#60A5FA]">
+            <span className="rounded-md border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-2 py-0.5 font-mono text-xs text-[#60A5FA]">
               recall_response_flow
             </span>
           </div>
@@ -134,7 +134,7 @@ export function ExperimentSummaryView({ operatorAuthenticated }: ExperimentSumma
                     <div className="flex items-center gap-1.5">
                       {isGuided && liftDelta !== null && (
                         <span
-                          className={`rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium ${
+                          className={`rounded-md border px-2 py-0.5 font-mono text-xs font-medium ${
                             liftDelta >= 0
                               ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
                               : 'border-amber-500/30 bg-amber-500/10 text-amber-300'
@@ -144,7 +144,7 @@ export function ExperimentSummaryView({ operatorAuthenticated }: ExperimentSumma
                           {liftDelta}pp
                         </span>
                       )}
-                      <span className="rounded-md border border-[#27272A] bg-[#09090B] px-2 py-0.5 font-mono text-[11px] text-[#A1A1AA]">
+                      <span className="rounded-md border border-[#27272A] bg-[#09090B] px-2 py-0.5 font-mono text-xs text-[#A1A1AA]">
                         n = {v.exposed_n}
                       </span>
                     </div>
@@ -168,19 +168,19 @@ export function ExperimentSummaryView({ operatorAuthenticated }: ExperimentSumma
                     />
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 border-t border-[#27272A] pt-3 font-mono text-[11px]">
+                  <div className="grid grid-cols-3 gap-2 border-t border-[#27272A] pt-3 font-mono text-xs">
                     <div className="rounded-lg border border-[#27272A]/80 bg-[#09090B] px-2.5 py-2">
-                      <div className="text-[#71717A]">Median Time</div>
+                      <div className="rr-muted">Median Time</div>
                       <div className="mt-0.5 text-sm font-semibold text-[#F4F4F5]">
                         {v.median_completion_seconds !== null ? `${v.median_completion_seconds}s` : '—'}
                       </div>
                     </div>
                     <div className="rounded-lg border border-[#27272A]/80 bg-[#09090B] px-2.5 py-2">
-                      <div className="text-[#71717A]">Timeouts</div>
+                      <div className="rr-muted">Timeouts</div>
                       <div className="mt-0.5 text-sm font-semibold text-[#F4F4F5]">{v.timeout_n}</div>
                     </div>
                     <div className="rounded-lg border border-[#27272A]/80 bg-[#09090B] px-2.5 py-2">
-                      <div className="text-[#71717A]">Errors</div>
+                      <div className="rr-muted">Errors</div>
                       <div className="mt-0.5 text-sm font-semibold text-[#F4F4F5]">
                         {v.total_incorrect_attempts}
                       </div>
@@ -200,7 +200,7 @@ export function ExperimentSummaryView({ operatorAuthenticated }: ExperimentSumma
                   <span className="text-[#F4F4F5]">{summary.excluded_n}</span>
                 </span>
               </div>
-              <div className="pl-6 text-[11px]">
+              <div className="pl-6 text-xs">
                 Event Outbox:{' '}
                 <span className="text-emerald-400">{summary.outbox.dispatched} dispatched</span> ·{' '}
                 <span>{summary.outbox.pending} pending</span> ·{' '}

@@ -43,7 +43,7 @@ const NAV_GROUPS: Array<{
     ],
   },
   {
-    title: 'Experimentation & AI',
+    title: 'Insights & tools',
     items: [
       { id: 'experiment', label: 'Experiment', icon: FlaskConical },
       { id: 'agent', label: 'Agent Workbench', icon: Bot },
@@ -102,6 +102,7 @@ export function OperatorConsole() {
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
+      <a href="#workspace" className="rr-skip-link">Skip to workspace</a>
       {/* Full-Height Enterprise Left Sidebar */}
       <aside className="flex w-full shrink-0 flex-col border-b border-[#1E1E24] bg-[#0B0B0E] lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:border-b-0 lg:border-r">
         {/* Brand Lockup */}
@@ -109,7 +110,7 @@ export function OperatorConsole() {
           <Link to="/" className="transition-opacity hover:opacity-95">
             <BrandLogo size="sm" showWordmark />
           </Link>
-          <span className="rounded border border-[#222228] bg-[#141418] px-1.5 py-0.5 font-mono text-[10px] font-medium text-[#71717A]">
+          <span className="rounded border border-[#222228] bg-[#141418] px-1.5 py-0.5 font-mono text-[11px] font-medium rr-muted">
             v1.0
           </span>
         </div>
@@ -121,7 +122,7 @@ export function OperatorConsole() {
         >
           {NAV_GROUPS.map((group) => (
             <div key={group.title} className="flex shrink-0 gap-1 lg:flex-col lg:space-y-1">
-              <div className="hidden px-2.5 pb-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] lg:block">
+              <div className="hidden px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#52525B] lg:block">
                 {group.title}
               </div>
               {group.items.map((item) => {
@@ -132,10 +133,11 @@ export function OperatorConsole() {
                     key={item.id}
                     type="button"
                     aria-label={item.label}
+                    aria-current={isActive ? 'page' : undefined}
                     onClick={() => setActiveTab(item.id)}
-                    className={`group relative flex shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-all ${
+                    className={`group relative flex shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-[#18181E] text-[#F4F4F5] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]'
+                        ? 'bg-[#18181E] text-[#F4F4F5]'
                         : 'text-[#A1A1AA] hover:bg-[#131318] hover:text-[#F4F4F5]'
                     }`}
                   >
@@ -144,7 +146,7 @@ export function OperatorConsole() {
                     )}
                     <Icon
                       className={`h-4 w-4 shrink-0 transition-colors ${
-                        isActive ? 'text-[#60A5FA]' : 'text-[#71717A] group-hover:text-[#A1A1AA]'
+                        isActive ? 'text-[#60A5FA]' : 'rr-muted group-hover:text-[#A1A1AA]'
                       }`}
                     />
                     <span>{item.label}</span>
@@ -156,18 +158,18 @@ export function OperatorConsole() {
         </nav>
 
         {/* Bottom-Docked Operator Session Panel */}
-        <div className="hidden border-t border-[#1E1E24] p-3.5 space-y-3 lg:block">
+        <div className="border-t border-[#1E1E24] p-3.5 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#71717A]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] rr-muted">
               Operator Session
             </span>
             {operatorAuthed ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-400">
                 <ShieldCheck className="h-3 w-3" />
                 Verified
               </span>
             ) : (
-              <span className="rounded-full bg-[#18181D] px-2 py-0.5 text-[10px] text-[#71717A]">
+              <span className="rounded-full bg-[#18181D] px-2 py-0.5 text-[11px] rr-muted">
                 Read-only
               </span>
             )}
@@ -204,14 +206,14 @@ export function OperatorConsole() {
             </form>
           )}
 
-          {authError && <div className="text-[11px] text-red-400">{authError}</div>}
+          {authError && <div className="text-xs text-red-400">{authError}</div>}
 
           <Link
             to="/join"
             className="flex items-center justify-between rounded-lg border border-[#222228] bg-[#111114] px-3 py-2 text-xs font-medium text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
           >
             <span>Participant /join</span>
-            <ExternalLink className="h-3.5 w-3.5 text-[#71717A]" />
+            <ExternalLink className="h-3.5 w-3.5 rr-muted" />
           </Link>
         </div>
       </aside>
@@ -219,28 +221,24 @@ export function OperatorConsole() {
       {/* Main Application Content Area */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Sticky Top Context Bar */}
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-4 border-b border-[#1E1E24] bg-[#09090B]/85 px-6 backdrop-blur-xl">
+        <header className="sticky top-0 z-20 flex min-h-14 flex-wrap items-center justify-between gap-2 py-3 border-b border-[#1E1E24] bg-[#09090B]/85 px-6 backdrop-blur-xl">
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-[#71717A]">{crumb.group}</span>
+            <span className="rr-muted">{crumb.group}</span>
             <ChevronRight className="h-3.5 w-3.5 text-[#3F3F46]" />
             <span className="font-medium text-[#F4F4F5]">{crumb.title}</span>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <span className="hidden items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-400 md:inline-flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              Flagsmith Connected
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[11px] font-medium text-amber-300">
+            <span className="rr-neutral-badge inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium">
               <ShieldAlert className="h-3.5 w-3.5" />
-              <span>Fictional Drill Platform</span>
+              <span>Fictional recall drill.</span>
             </span>
             <ThemeToggle />
           </div>
         </header>
 
         {/* Scrollable Workspace Canvas */}
-        <main className="mx-auto w-full max-w-[1320px] flex-1 px-6 py-7">
+        <main id="workspace" tabIndex={-1} className="mx-auto w-full max-w-[1320px] flex-1 px-4 py-6 sm:px-8 sm:py-8">
           {activeTab === 'overview' && (
             <OperatorOverview
               operatorAuthenticated={operatorAuthed}

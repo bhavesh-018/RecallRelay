@@ -75,9 +75,9 @@ export function ThemeToggle() {
       className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#222228] bg-[#111114] text-[#F4F4F5] transition-colors hover:border-[#32323C]"
     >
       {isLight ? (
-        <Moon className="h-4 w-4 text-[#1D4ED8]" />
+        <Moon className="h-4 w-4 rr-muted" />
       ) : (
-        <Sun className="h-4 w-4 text-amber-300" />
+        <Sun className="h-4 w-4 rr-muted" />
       )}
     </button>
   );

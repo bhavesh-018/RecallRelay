@@ -174,14 +174,14 @@ export function BatchTraceView() {
               <div className="flex items-center gap-2">
                 <GitBranch className="h-4 w-4 text-[#60A5FA]" />
                 <span className="font-medium text-[#F4F4F5]">{trace.product_name}</span>
-                <span className="rounded border border-[#27272A] bg-[#09090B] px-1.5 py-0.5 font-mono text-[11px] text-[#60A5FA]">
+                <span className="rounded border border-[#27272A] bg-[#09090B] px-1.5 py-0.5 font-mono text-xs text-[#60A5FA]">
                   {trace.batch_code}
                 </span>
-                <span className="text-[#71717A]">
+                <span className="rr-muted">
                   · {trace.nodes.length} nodes · {trace.edges.length} transfers
                 </span>
               </div>
-              <span className="font-mono text-[11px] text-[#A1A1AA]">
+              <span className="font-mono text-xs text-[#A1A1AA]">
                 {trace.total_remaining} rem + {trace.total_sold} sold ={' '}
                 <span className="text-[#F4F4F5]">
                   {trace.accounted_total} / {trace.opening_quantity}
@@ -349,11 +349,11 @@ export function BatchTraceView() {
                 <div className="flex items-center gap-2">
                   <Layers className="h-4 w-4 text-[#60A5FA]" />
                   <span className="font-semibold text-[#F4F4F5]">{activeNode.location_name}</span>
-                  <span className="rounded border border-[#27272A] bg-[#09090B] px-1.5 py-0.5 text-[10px] capitalize text-[#A1A1AA]">
+                  <span className="rounded border border-[#27272A] bg-[#09090B] px-1.5 py-0.5 text-[11px] capitalize text-[#A1A1AA]">
                     {activeNode.role}
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 font-mono text-[11px] text-[#E4E4E7]">
+                <div className="flex flex-wrap items-center gap-3 font-mono text-xs text-[#E4E4E7]">
                   <span>Received: {activeNode.received}</span>
                   <span>Forwarded: {activeNode.forwarded}</span>
                   <span>Sold: {activeNode.sold}</span>
@@ -372,7 +372,7 @@ export function BatchTraceView() {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-xs">
                 <thead>
-                  <tr className="border-b border-[#27272A] bg-[#09090B] text-[11px] uppercase tracking-wider text-[#71717A]">
+                  <tr className="border-b border-[#27272A] bg-[#09090B] text-xs uppercase tracking-wider rr-muted">
                     <th className="px-4 py-2.5 font-medium">Shipment ID</th>
                     <th className="px-3 py-2.5 font-medium">Route</th>
                     <th className="px-4 py-2.5 text-right font-medium">Units</th>
@@ -381,11 +381,11 @@ export function BatchTraceView() {
                 <tbody className="divide-y divide-[#27272A]/70 font-mono tabular-nums">
                   {trace.edges.map((edge) => (
                     <tr key={edge.shipment_id} className="transition-colors hover:bg-[#1C1C21]/60">
-                      <td className="px-4 py-2.5 text-[#71717A]">{edge.shipment_id}</td>
+                      <td className="px-4 py-2.5 rr-muted">{edge.shipment_id}</td>
                       <td className="px-3 py-2.5 font-sans text-[#F4F4F5]">
                         <span className="inline-flex items-center gap-2">
                           <span>{edge.sender_name}</span>
-                          <ArrowRight className="h-3.5 w-3.5 text-[#71717A]" />
+                          <ArrowRight className="h-3.5 w-3.5 rr-muted" />
                           <span>{edge.receiver_name}</span>
                         </span>
                       </td>
