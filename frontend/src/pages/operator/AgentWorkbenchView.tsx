@@ -149,7 +149,7 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold tracking-tight text-[#F4F4F5]">Bounded Agent Workbench</h2>
-            <span className="inline-flex items-center gap-1 rounded-md border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-2 py-0.5 font-mono text-[11px] text-[#60A5FA]">
+            <span className="inline-flex items-center gap-1 rounded-md border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-2 py-0.5 font-mono text-xs text-[#60A5FA]">
               <Lock className="h-3 w-3" />
               Pilot / recall_response_flow
             </span>
@@ -170,7 +170,7 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
       <form onSubmit={handleRun} className="rr-surface rounded-xl p-4 space-y-3">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
           <div>
-            <label htmlFor="agent-drill-id" className="mb-1 block text-[11px] font-medium text-[#A1A1AA]">
+            <label htmlFor="agent-drill-id" className="mb-1 block text-xs font-medium text-[#A1A1AA]">
               Drill / Batch ID
             </label>
             <input
@@ -181,7 +181,7 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
             />
           </div>
           <div className="sm:col-span-4">
-            <label htmlFor="agent-instruction" className="mb-1 block text-[11px] font-medium text-[#A1A1AA]">
+            <label htmlFor="agent-instruction" className="mb-1 block text-xs font-medium text-[#A1A1AA]">
               Operator Instruction
             </label>
             <div className="flex gap-2">
@@ -204,7 +204,7 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-          <span className="inline-flex items-center gap-1 text-[11px] text-[#71717A]">
+          <span className="inline-flex items-center gap-1 text-xs rr-muted">
             <Sparkles className="h-3 w-3" />
             Presets:
           </span>
@@ -213,7 +213,7 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
               key={preset.label}
               type="button"
               onClick={() => setInstruction(preset.text)}
-              className="rounded-md border border-[#27272A] bg-[#09090B] px-2.5 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#3B82F6]/50 hover:text-[#F4F4F5]"
+              className="rounded-md border border-[#27272A] bg-[#09090B] px-2.5 py-1 text-xs text-[#A1A1AA] transition-colors hover:border-[#3B82F6]/50 hover:text-[#F4F4F5]"
             >
               {preset.label}
             </button>
@@ -234,7 +234,7 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
 
       {/* 5-Stage Bounded Pipeline Stepper */}
       {latest && (
-        <div className="grid grid-cols-5 gap-2 text-center font-mono text-[11px]">
+        <div className="grid grid-cols-5 gap-2 text-center font-mono text-xs">
           {['1. Read', '2. Propose', '3. Validate', '4. Approve', '5. Verify'].map((label, idx) => {
             const done =
               idx < 3 ||
@@ -249,7 +249,7 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
                     ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
                     : active
                       ? 'border-amber-500/40 bg-amber-500/10 text-amber-300'
-                      : 'border-[#27272A] bg-[#141417] text-[#71717A]'
+                      : 'border-[#27272A] bg-[#141417] rr-muted'
                 }`}
               >
                 {done && <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />}
@@ -274,14 +274,14 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
                 <div className="flex flex-wrap items-center gap-2">
                   <Bot className="h-4 w-4 text-[#60A5FA]" />
                   <span className="font-mono font-semibold text-[#F4F4F5]">{prop.id}</span>
-                  <span className="rounded border border-[#27272A] bg-[#09090B] px-1.5 py-0.5 font-mono text-[11px] text-[#A1A1AA]">
+                  <span className="rounded border border-[#27272A] bg-[#09090B] px-1.5 py-0.5 font-mono text-xs text-[#A1A1AA]">
                     rev #{prop.revision}
                   </span>
-                  <span className="font-mono text-[11px] text-[#71717A]">
+                  <span className="font-mono text-xs rr-muted">
                     {prop.target_environment}/{prop.target_feature}
                   </span>
                 </div>
-                <span className={`rounded-md border px-2.5 py-0.5 font-mono text-[11px] font-medium ${statusBadge(prop.status)}`}>
+                <span className={`rounded-md border px-2.5 py-0.5 font-mono text-xs font-medium ${statusBadge(prop.status)}`}>
                   {prop.status}
                 </span>
               </div>
@@ -290,14 +290,14 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
 
               {/* Structured Diff Preview */}
               <div className="rounded-lg border border-[#27272A] bg-[#09090B] p-3.5 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px]">
+                <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
                   <span className="text-[#A1A1AA]">
                     Action:{' '}
                     <span className="font-semibold text-[#F4F4F5]">
                       {String(prop.diff.recommendation_type)}
                     </span>
                   </span>
-                  <span className="text-[#71717A]" title={prop.baseline_config_hash}>
+                  <span className="rr-muted" title={prop.baseline_config_hash}>
                     Baseline lock: {prop.baseline_config_hash.slice(0, 22)}…
                   </span>
                 </div>
@@ -305,8 +305,8 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
                 {isChange && proposedWeights && (
                   <div className="grid grid-cols-1 gap-4 border-t border-[#222228] pt-3 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-[#71717A]">Current Pilot Split</span>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="rr-muted">Current Pilot Split</span>
                         <span className="font-mono text-[#A1A1AA]">
                           {currentWeights?.standard ?? 50}% std / {currentWeights?.guided ?? 50}% gdd
                         </span>
@@ -323,7 +323,7 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-[11px]">
+                      <div className="flex items-center justify-between text-xs">
                         <span className="font-medium text-[#60A5FA]">Proposed Pilot Split</span>
                         <span className="font-mono font-semibold text-[#F4F4F5]">
                           {proposedWeights.standard ?? 0}% std / {proposedWeights.guided ?? 100}% gdd
@@ -345,11 +345,11 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
 
                 {prop.evidence_ids.length > 0 && (
                   <div className="flex flex-wrap items-center gap-1.5 border-t border-[#27272A] pt-2.5">
-                    <span className="text-[11px] text-[#71717A]">Cited Evidence:</span>
+                    <span className="text-xs rr-muted">Cited Evidence:</span>
                     {prop.evidence_ids.map((eid) => (
                       <span
                         key={eid}
-                        className="rounded border border-[#27272A] bg-[#141417] px-2 py-0.5 font-mono text-[10px] text-[#A1A1AA]"
+                        className="rounded border border-[#27272A] bg-[#141417] px-2 py-0.5 font-mono text-[11px] text-[#A1A1AA]"
                       >
                         {eid}
                       </span>
@@ -361,13 +361,13 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
                   <button
                     type="button"
                     onClick={() => setExpandedJsonId(isJsonOpen ? null : prop.id)}
-                    className="inline-flex items-center gap-1 text-[11px] text-[#71717A] hover:text-[#F4F4F5]"
+                    className="inline-flex items-center gap-1 text-xs rr-muted hover:text-[#F4F4F5]"
                   >
                     {isJsonOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                     {isJsonOpen ? 'Hide raw proposal JSON' : 'Inspect raw proposal JSON'}
                   </button>
                   {isJsonOpen && (
-                    <pre className="mt-2 overflow-x-auto rounded border border-[#27272A] bg-[#141417] p-2.5 font-mono text-[11px] text-[#E4E4E7]">
+                    <pre className="mt-2 overflow-x-auto rounded border border-[#27272A] bg-[#141417] p-2.5 font-mono text-xs text-[#E4E4E7]">
                       {JSON.stringify(prop.diff, null, 2)}
                     </pre>
                   )}
@@ -426,9 +426,9 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-[#F4F4F5]">
-                    {r.id} · {r.state} <span className="text-[#71717A]">({r.model_name})</span>
+                    {r.id} · {r.state} <span className="rr-muted">({r.model_name})</span>
                   </span>
-                  <span className="text-[11px] text-[#71717A]">
+                  <span className="text-xs rr-muted">
                     {r.tool_calls.length} tools · {r.attempts} attempt(s)
                   </span>
                 </div>
@@ -438,7 +438,7 @@ export function AgentWorkbenchView({ operatorAuthenticated }: AgentWorkbenchView
                     {r.tool_calls.map((tc, idx) => (
                       <span
                         key={`${r.id}-${tc.tool_name}-${idx}`}
-                        className="inline-flex items-center gap-1 rounded border border-[#27272A] bg-[#141417] px-2 py-0.5 text-[10px]"
+                        className="inline-flex items-center gap-1 rounded border border-[#27272A] bg-[#141417] px-2 py-0.5 text-[11px]"
                       >
                         <Wrench className="h-2.5 w-2.5 text-[#60A5FA]" />
                         <span className="text-[#E4E4E7]">{tc.tool_name}</span>

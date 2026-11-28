@@ -48,17 +48,6 @@ function statusPillClasses(status: string): string {
   }
 }
 
-function roleBadgeClasses(role: string): string {
-  switch (role) {
-    case 'manufacturer':
-      return 'border-blue-500/30 bg-blue-500/10 text-blue-300';
-    case 'distributor':
-      return 'border-violet-500/30 bg-violet-500/10 text-violet-300';
-    default:
-      return 'border-[#27272A] bg-[#09090B] text-[#A1A1AA]';
-  }
-}
-
 export function OperatorOverview({
   operatorAuthenticated,
   onNavigatePublish,
@@ -243,21 +232,21 @@ export function OperatorOverview({
             <h1 className="text-2xl font-semibold tracking-[-0.025em] text-[#F4F4F5]">
               Batch {overview.batch_code}
             </h1>
-            <span className="text-lg font-normal text-[#71717A]">·</span>
+            <span className="text-lg font-normal rr-muted">·</span>
             <span className="text-base font-medium text-[#D4D4D8]">{overview.product_name}</span>
-            <span className="rounded-md border border-[#222228] bg-[#141418] px-2 py-0.5 font-mono text-[11px] text-[#A1A1AA]">
+            <span className="rounded-md border border-[#222228] bg-[#141418] px-2 py-0.5 font-mono text-xs text-[#A1A1AA]">
               v{overview.notice_version}
             </span>
           </div>
-          <p className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-[#71717A]">
+          <p className="mt-1.5 flex flex-wrap items-center gap-2 text-xs rr-muted">
             <span className="inline-flex items-center gap-1.5 text-emerald-400">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-              Live 5s telemetry
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              Updates every 5s
             </span>
             <span>·</span>
             <span>Last sync {lastUpdated || 'just now'}</span>
             <span>·</span>
-            <span>{overview.total_tasks} supply-chain nodes tracked</span>
+            <span>{overview.total_tasks} locations tracked</span>
           </p>
         </div>
 
@@ -279,49 +268,49 @@ export function OperatorOverview({
 
       {/* KPI Metric Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rr-surface-interactive rounded-xl p-5 space-y-3">
+        <div className="rr-surface rounded-xl p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#71717A]">
+            <span className="text-xs font-medium uppercase tracking-[0.06em] rr-muted">
               Opening Batch
             </span>
-            <Package className="h-4 w-4 text-[#60A5FA]" />
+            <Package className="h-4 w-4 rr-metric-icon" />
           </div>
           <div className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-[#F4F4F5]">
             {overview.trace.opening_quantity}
           </div>
-          <div className="text-xs text-[#71717A]">
+          <div className="text-xs rr-muted">
             Accounted:{' '}
             <span className="font-mono font-medium text-[#D4D4D8]">{overview.trace.accounted_total} units</span>
           </div>
         </div>
 
-        <div className="rr-surface-interactive rounded-xl p-5 space-y-3">
+        <div className="rr-surface rounded-xl p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#71717A]">
+            <span className="text-xs font-medium uppercase tracking-[0.06em] rr-muted">
               Remaining Stock
             </span>
-            <Warehouse className="h-4 w-4 text-amber-400" />
+            <Warehouse className="h-4 w-4 rr-metric-icon" />
           </div>
           <div className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-[#F4F4F5]">
             {overview.trace.total_remaining}
           </div>
-          <div className="text-xs text-[#71717A]">
+          <div className="text-xs rr-muted">
             Quarantined:{' '}
             <span className="font-mono font-medium text-emerald-400">{overview.trace.total_set_aside} set aside</span>
           </div>
         </div>
 
-        <div className="rr-surface-interactive rounded-xl p-5 space-y-3">
+        <div className="rr-surface rounded-xl p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#71717A]">
+            <span className="text-xs font-medium uppercase tracking-[0.06em] rr-muted">
               Sold Downstream
             </span>
-            <ShoppingBag className="h-4 w-4 text-violet-400" />
+            <ShoppingBag className="h-4 w-4 rr-metric-icon" />
           </div>
           <div className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-[#F4F4F5]">
             {overview.trace.total_sold}
           </div>
-          <div className="text-xs text-[#71717A]">
+          <div className="text-xs rr-muted">
             Discrepancy:{' '}
             <span
               className={`font-mono font-medium ${
@@ -333,17 +322,17 @@ export function OperatorOverview({
           </div>
         </div>
 
-        <div className="rr-surface-interactive rounded-xl p-5 space-y-3">
+        <div className="rr-surface rounded-xl p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#71717A]">
+            <span className="text-xs font-medium uppercase tracking-[0.06em] rr-muted">
               Tasks Reconciled
             </span>
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <CheckCircle2 className="h-4 w-4 rr-metric-icon" />
           </div>
           <div className="flex items-baseline justify-between">
             <span className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-[#F4F4F5]">
               {overview.completed_tasks}
-              <span className="text-base font-normal text-[#71717A]"> / {overview.total_tasks}</span>
+              <span className="text-base font-normal rr-muted"> / {overview.total_tasks}</span>
             </span>
             <span className="font-mono text-xs font-medium text-[#60A5FA]">{pctComplete}%</span>
           </div>
@@ -360,7 +349,7 @@ export function OperatorOverview({
       <div className="rr-surface rounded-xl p-4 space-y-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
           <span className="font-medium text-[#F4F4F5]">Batch Unit Conservation</span>
-          <div className="flex flex-wrap items-center gap-4 font-mono text-[11px] text-[#A1A1AA]">
+          <div className="flex flex-wrap items-center gap-4 font-mono text-xs text-[#A1A1AA]">
             <span className="inline-flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               Quarantined ({overview.trace.total_set_aside})
@@ -370,7 +359,7 @@ export function OperatorOverview({
               Pending Quarantine ({unquarantinedRem})
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-violet-500" />
+              <span className="h-2 w-2 rounded-full rr-stock-sold" />
               Sold ({overview.trace.total_sold})
             </span>
           </div>
@@ -378,7 +367,7 @@ export function OperatorOverview({
         <div className="flex h-2 w-full overflow-hidden rounded-full bg-[#09090B]">
           <div className="bg-emerald-500 transition-all duration-300" style={{ width: `${quarantinedPct}%` }} />
           <div className="bg-amber-400/80 transition-all duration-300" style={{ width: `${unquarantinedPct}%` }} />
-          <div className="bg-violet-500 transition-all duration-300" style={{ width: `${soldPct}%` }} />
+          <div className="rr-stock-sold transition-all duration-300" style={{ width: `${soldPct}%` }} />
         </div>
       </div>
 
@@ -400,8 +389,9 @@ export function OperatorOverview({
             <button
               key={r}
               type="button"
+              aria-pressed={roleFilter === r}
               onClick={() => setRoleFilter(r)}
-              className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-medium capitalize transition-colors ${
+              className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium capitalize transition-colors ${
                 roleFilter === r
                   ? 'border-[#3B82F6]/50 bg-[#3B82F6]/15 text-[#60A5FA]'
                   : 'border-[#222228] bg-[#111114] text-[#A1A1AA] hover:text-[#F4F4F5]'
@@ -415,8 +405,9 @@ export function OperatorOverview({
             <button
               key={st}
               type="button"
+              aria-pressed={statusFilter === st}
               onClick={() => setStatusFilter(st)}
-              className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-medium capitalize transition-colors ${
+              className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium capitalize transition-colors ${
                 statusFilter === st
                   ? 'border-[#3B82F6]/50 bg-[#3B82F6]/15 text-[#60A5FA]'
                   : 'border-[#222228] bg-[#111114] text-[#A1A1AA] hover:text-[#F4F4F5]'
@@ -433,13 +424,13 @@ export function OperatorOverview({
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs">
             <thead>
-              <tr className="border-b border-[#222228] bg-[#0B0B0E] text-[10px] font-semibold uppercase tracking-[0.07em] text-[#71717A]">
+              <tr className="border-b border-[#222228] bg-[#0B0B0E] text-[11px] font-semibold uppercase tracking-[0.07em] rr-muted">
                 <th className="px-5 py-3">Location ({filteredTasks.length})</th>
-                <th className="px-3 py-3 text-right">Recv</th>
-                <th className="px-3 py-3 text-right">Fwd</th>
+                <th className="px-3 py-3 text-right">Received</th>
+                <th className="px-3 py-3 text-right">Forwarded</th>
                 <th className="px-3 py-3 text-right">Sold</th>
-                <th className="px-3 py-3 text-right">Rem</th>
-                <th className="px-3 py-3 text-right">Aside</th>
+                <th className="px-3 py-3 text-right">Remaining</th>
+                <th className="px-3 py-3 text-right">Set aside</th>
                 <th className="px-4 py-3 text-right">Status</th>
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
@@ -451,7 +442,7 @@ export function OperatorOverview({
                     <div className="flex items-center gap-2.5">
                       <span className="font-medium text-[#F4F4F5]">{task.location_name}</span>
                       <span
-                        className={`rounded border px-1.5 py-0.5 text-[10px] font-medium capitalize ${roleBadgeClasses(task.role)}`}
+                        className={`rounded border px-1.5 py-0.5 text-[11px] font-medium capitalize rr-neutral-badge`}
                       >
                         {task.role}
                       </span>
@@ -470,7 +461,7 @@ export function OperatorOverview({
                   </td>
                   <td className="px-4 py-3.5 text-right font-sans">
                     <span
-                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${statusPillClasses(task.status)}`}
+                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${statusPillClasses(task.status)}`}
                     >
                       {task.status}
                     </span>
@@ -479,7 +470,7 @@ export function OperatorOverview({
                     <div className="inline-flex items-center gap-1.5">
                       <Link
                         to={`/t/${task.access_token}`}
-                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2.5 py-1 text-[11px] font-medium text-[#F4F4F5] transition-colors hover:border-[#3B82F6] hover:text-[#60A5FA]"
+                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2.5 py-1 text-xs font-medium text-[#F4F4F5] transition-colors hover:border-[#3B82F6] hover:text-[#60A5FA]"
                       >
                         <ExternalLink className="h-3 w-3" />
                         Open
@@ -487,7 +478,7 @@ export function OperatorOverview({
                       <button
                         type="button"
                         onClick={() => handleCopyLink(task.task_id, task.access_token)}
-                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
+                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2 py-1 text-xs text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
                       >
                         {copiedTaskId === task.task_id ? (
                           <Check className="h-3 w-3 text-emerald-400" />
@@ -499,7 +490,7 @@ export function OperatorOverview({
                       <button
                         type="button"
                         onClick={() => void handleShowQr(task.task_id)}
-                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
+                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2 py-1 text-xs text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
                       >
                         <QrCode className="h-3 w-3" />
                         QR
@@ -507,7 +498,7 @@ export function OperatorOverview({
                       <button
                         type="button"
                         onClick={() => void handleInspectAudit(task.task_id, task.location_name)}
-                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2 py-1 text-[11px] text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
+                        className="inline-flex items-center gap-1 rounded-md border border-[#222228] bg-[#09090B] px-2 py-1 text-xs text-[#A1A1AA] transition-colors hover:border-[#32323C] hover:text-[#F4F4F5]"
                       >
                         <ClipboardList className="h-3 w-3" />
                         Audit
@@ -518,7 +509,7 @@ export function OperatorOverview({
               ))}
               {filteredTasks.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-5 py-10 text-center font-sans text-xs text-[#71717A]">
+                  <td colSpan={8} className="px-5 py-10 text-center font-sans text-xs rr-muted">
                     No locations match the current filter.
                   </td>
                 </tr>
@@ -573,16 +564,16 @@ export function OperatorOverview({
                     />
                     <div>
                       <div className="text-sm font-semibold text-[#F4F4F5]">{qrPayload.location_name}</div>
-                      <div className="mt-0.5 text-[11px] text-[#71717A]">{qrPayload.banner}</div>
+                      <div className="mt-0.5 text-xs rr-muted">{qrPayload.banner}</div>
                     </div>
                   </div>
 
-                  <div className="rounded-lg border border-[#222228] bg-[#09090B] px-3 py-2 font-mono text-[11px] break-all text-[#A1A1AA]">
+                  <div className="rounded-lg border border-[#222228] bg-[#09090B] px-3 py-2 font-mono text-xs break-all text-[#A1A1AA]">
                     {qrPayload.target_url}
                   </div>
 
                   {qrPayload.is_localhost_warning && (
-                    <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-300">
+                    <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
                       Localhost URL detected: open the console via your cloudflared HTTPS URL before scanning from a phone.
                     </div>
                   )}
@@ -620,7 +611,7 @@ export function OperatorOverview({
                   <ClipboardList className="h-4 w-4 text-[#60A5FA]" />
                   Audit Timeline
                 </div>
-                <div className="mt-0.5 font-mono text-[11px] text-[#71717A]">
+                <div className="mt-0.5 font-mono text-xs rr-muted">
                   {auditLocationName} · {auditTaskId}
                 </div>
               </div>
@@ -639,7 +630,7 @@ export function OperatorOverview({
                   {auditError}
                 </div>
               ) : auditEvents.length === 0 ? (
-                <div className="py-12 text-center text-xs text-[#71717A]">
+                <div className="py-12 text-center text-xs rr-muted">
                   No audit events recorded for this task yet.
                 </div>
               ) : (
@@ -650,11 +641,11 @@ export function OperatorOverview({
                       <div className="rr-surface rounded-lg p-3 space-y-1.5">
                         <div className="flex items-center justify-between gap-2 font-mono text-xs">
                           <span className="font-semibold text-[#F4F4F5]">{ev.action}</span>
-                          <span className="text-[10px] text-[#71717A]">
+                          <span className="text-[11px] rr-muted">
                             {new Date(ev.created_at).toLocaleTimeString()}
                           </span>
                         </div>
-                        <div className="font-mono text-[11px] text-[#A1A1AA]">
+                        <div className="font-mono text-xs text-[#A1A1AA]">
                           actor: {ev.actor}
                           {ev.revision_ref !== null ? ` · rev #${ev.revision_ref}` : ''}
                         </div>

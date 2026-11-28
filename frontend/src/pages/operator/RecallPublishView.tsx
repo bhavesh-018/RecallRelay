@@ -143,7 +143,7 @@ export function RecallPublishView({
                 <MapPin className="h-3.5 w-3.5 text-[#60A5FA]" />
                 Affected Locations Preview ({preview.nodes.length} scoped tasks)
               </span>
-              <span className="font-mono text-[11px] text-[#71717A]">
+              <span className="font-mono text-xs rr-muted">
                 {preview.opening_quantity} opening units
               </span>
             </div>
@@ -151,7 +151,7 @@ export function RecallPublishView({
               {preview.nodes.map((n) => (
                 <span
                   key={n.location_id}
-                  className="rounded-md border border-[#27272A] bg-[#141417] px-2.5 py-1 text-[11px] text-[#A1A1AA]"
+                  className="rounded-md border border-[#27272A] bg-[#141417] px-2.5 py-1 text-xs text-[#A1A1AA]"
                 >
                   {n.location_name}{' '}
                   <span className="font-mono font-semibold text-[#F4F4F5]">({n.received})</span>

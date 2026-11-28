@@ -68,7 +68,7 @@ export function BrandLogo({ size = 'sm', showWordmark = false, subtitle }: Brand
             </span>
           </div>
           {subtitle && (
-            <span className="mt-0.5 text-[11px] font-normal text-[#71717A]">{subtitle}</span>
+            <span className="mt-0.5 text-xs font-normal rr-muted">{subtitle}</span>
           )}
         </div>
       )}
