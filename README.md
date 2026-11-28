@@ -13,13 +13,14 @@ RecallRelay models a multi-tier supply-chain batch recall across a manufacturer,
 
 ---
 
-## Technical Coverage Across All 3 Tracks
+## Technical Coverage Across All 4 Tracks
 
 | Track | What RecallRelay Delivers | Key Implementation |
 | --- | --- | --- |
 | **1. Test Something Real** | Server-side Flagsmith A/B experiment on multivariate flag `recall_response_flow` (`standard` single-page vs. `guided` 3-step Count → Reconcile → Confirm), 300s server-side timer cutoff, durable PostgreSQL `EventOutbox`, consistent pseudonymous identities, and deidentified CSV export. | [flagsmith_client.py](backend/app/experiments/flagsmith_client.py), [sessions.py](backend/app/experiments/sessions.py), [outbox.py](backend/app/experiments/outbox.py), [analytics_router.py](backend/app/experiments/analytics_router.py) |
 | **2. AI Agents & Feature Flags** | Bounded LLM product analyst (`<= 8` tool calls, `<= 2` repair attempts, `60s` budget) using Gemini, deterministic evidence validator rejecting fabricated counts/IDs, human operator approval with SHA-256 baseline config hash lock, Flagsmith Management API v2/v1 publish + independent readback verification, and a 9-scenario adversarial evaluation suite. | [orchestrator.py](backend/app/proposals/orchestrator.py), [validator.py](backend/app/proposals/validator.py), [executor.py](backend/app/proposals/executor.py), [run_evals.py](backend/tests/agent_evaluations/run_evals.py) |
 | **3. Build on Open Source Flagsmith** | Fixture-agnostic reusable `<RecallFlow />` React component + backend reconciliation verified on a completely distinct second dataset (`fixtures/second_drill.json` — cold-chain vaccine vials `MED-404`/`MED-405` across 6 locations), plus a self-hosted Flagsmith Docker Compose profile (`localhost:8000`). | [RecallFlow.tsx](frontend/src/components/RecallFlow/RecallFlow.tsx), [second_drill.json](fixtures/second_drill.json), [docker-compose.yml](docker-compose.yml), [test_second_fixture_reuse.py](backend/tests/test_second_fixture_reuse.py) |
+| **4. Flagsmith Agent Skills** | Installable Agent Skill (`flagsmith-experiment-guard`) backed by a token-efficient CLI (`inspect` → `preflight` → human-approved `apply` → `verify`) emitting `< 260`-byte JSON, hard-blocking `Production`/`Study` mutations, enforcing SHA-256 drift locks, and verifying live Flagsmith readback. | [SKILL.md](skills/flagsmith-experiment-guard/SKILL.md), [flagsmith_guard_cli.py](scripts/flagsmith_guard_cli.py), [test_flagsmith_guard_skill.py](backend/tests/test_flagsmith_guard_skill.py) |
 
 ---
 
